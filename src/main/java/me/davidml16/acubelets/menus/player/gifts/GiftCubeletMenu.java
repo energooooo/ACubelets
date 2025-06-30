@@ -7,7 +7,7 @@ import me.davidml16.acubelets.objects.GUILayout;
 import me.davidml16.acubelets.objects.GiftGuiSession;
 import me.davidml16.acubelets.objects.Menu;
 import me.davidml16.acubelets.utils.ItemBuilder;
-import me.davidml16.acubelets.utils.SkullCreator;
+import me.davidml16.acubelets.utils.SkullUtils;
 import me.davidml16.acubelets.utils.Utils;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -21,186 +21,180 @@ import java.util.List;
 
 public class GiftCubeletMenu extends Menu {
 
-    public GiftCubeletMenu(Main main, Player player) {
-        super(main, player);
-        setSize(6);
-    }
+	public GiftCubeletMenu(Main main, Player player) {
+		super(main, player);
+		setSize(6);
+	}
 
-    @Override
-    public void OnPageOpened(int page) {
+	@Override
+	public void OnPageOpened(int page) {
 
-        GUILayout guiLayout = getMain().getLayoutHandler().getLayout("giftamount");
+		GUILayout guiLayout = getMain().getLayoutHandler().getLayout("giftamount");
 
-        Player player = getOwner();
-        GiftGuiSession session = (GiftGuiSession) getAttribute(AttrType.GIFT_GUISESSION_ATTR);
+		Player player = getOwner();
+		GiftGuiSession session = (GiftGuiSession) getAttribute(AttrType.GIFT_GUISESSION_ATTR);
 
-        if(session.getAvailable() == 0) {
+		if (session.getAvailable() == 0) {
 
-            GiftMenu giftMenu = new GiftMenu(getMain(), player);
-            giftMenu.setAttribute(AttrType.GIFT_GUISESSION_ATTR, session);
-            giftMenu.open();
+			GiftMenu giftMenu = new GiftMenu(getMain(), player);
+			giftMenu.setAttribute(AttrType.GIFT_GUISESSION_ATTR, session);
+			giftMenu.open();
 
-            return;
+			return;
 
-        }
+		}
 
-        if(session.getCubeletAmount() > session.getAvailable()) {
+		if (session.getCubeletAmount() > session.getAvailable()) {
 
-            session.setCubeletAmount(1);
+			session.setCubeletAmount(1);
 
-            reloadMyMenu();
+			reloadMyMenu();
 
-            return;
+			return;
 
-        }
+		}
 
-        Inventory gui = createInventory(getSize(), guiLayout.getMessage("Title")
-                        .replaceAll("%cubelet_type%", Utils.removeColors(session.getCubeletType().getName()))
-                        .replaceAll("%amount%", String.valueOf(session.getCubeletAmount())));
+		Inventory gui = createInventory(getSize(), guiLayout.getMessage("Title")
+				.replaceAll("%cubelet_type%", Utils.removeColors(session.getCubeletType().getName()))
+				.replaceAll("%amount%", String.valueOf(session.getCubeletAmount())));
 
-        ItemStack back = new ItemBuilder(XMaterial.matchXMaterial(guiLayout.getMessage("Items.Back.Material")).get().parseItem())
-                .setName(guiLayout.getMessage("Items.Back.Name"))
-                .setLore(guiLayout.getMessageList("Items.Back.Lore"))
-                .toItemStack();
-        back = NBTEditor.set(back, "back", "action");
-        gui.setItem((getSize() - 10) + guiLayout.getSlot("Back"), back);
+		ItemStack back = new ItemBuilder(XMaterial.matchXMaterial(guiLayout.getMessage("Items.Back.Material"))
+				.get()
+				.parseItem()).setName(guiLayout.getMessage("Items.Back.Name"))
+				.setLore(guiLayout.getMessageList("Items.Back.Lore"))
+				.toItemStack();
+		back = NBTEditor.set(back, "back", NBTEditor.CUSTOM_DATA, "action");
+		gui.setItem((getSize() - 10) + guiLayout.getSlot("Back"), back);
 
-        List<String> cubeletLore = new ArrayList<>();
+		List<String> cubeletLore = new ArrayList<>();
 
-        if(Bukkit.getPlayer(session.getTargetName()) != null) {
+		if (Bukkit.getPlayer(session.getTargetName()) != null) {
 
-            for (String line : guiLayout.getMessageList("Items.Cubelet.Lore")) {
+			for (String line : guiLayout.getMessageList("Items.Cubelet.Lore")) {
 
-                cubeletLore.add(Utils.translate(line
-                        .replaceAll("%gift_amount%", String.valueOf(session.getCubeletAmount())))
-                        .replaceAll("%receiver%", session.getTargetName())
-                );
+				cubeletLore.add(Utils.translate(line.replaceAll("%gift_amount%", String.valueOf(session.getCubeletAmount())))
+						.replaceAll("%receiver%", session.getTargetName()));
 
-            }
+			}
 
-        } else {
+		} else {
 
-            for (String line : guiLayout.getMessageList("Items.Cubelet.Lore")) {
+			for (String line : guiLayout.getMessageList("Items.Cubelet.Lore")) {
 
-                cubeletLore.add(Utils.translate(line
-                        .replaceAll("%gift_amount%", String.valueOf(session.getCubeletAmount())))
-                        .replaceAll("%receiver%", session.getTargetName())
-                );
+				cubeletLore.add(Utils.translate(line.replaceAll("%gift_amount%", String.valueOf(session.getCubeletAmount())))
+						.replaceAll("%receiver%", session.getTargetName()));
 
-            }
+			}
 
-        }
+		}
 
-        ItemStack cubelet = new ItemBuilder(session.getCubeletType().getIcon().clone())
-                .setName(Utils.translate(guiLayout.getMessage("Items.Cubelet.Name").replace("%cubelet_name%", session.getCubeletType().getName())))
-                .setLore(cubeletLore)
-                .toItemStack();
-        cubelet = NBTEditor.set(cubelet, "send", "action");
-        gui.setItem(getCenterSlot(), cubelet);
+		ItemStack cubelet = new ItemBuilder(session.getCubeletType()
+				.getIcon()
+				.clone()).setName(Utils.translate(guiLayout.getMessage("Items.Cubelet.Name")
+				.replace("%cubelet_name%", session.getCubeletType().getName()))).setLore(cubeletLore).toItemStack();
+		cubelet = NBTEditor.set(cubelet, "send", NBTEditor.CUSTOM_DATA, "action");
+		gui.setItem(getCenterSlot(), cubelet);
 
-        ItemStack add = new ItemBuilder(SkullCreator.itemFromBase64("eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNjFkMGY4MmEyYTRjZGQ4NWY3OWY0ZDlkOTc5OGY5YzNhNWJjY2JlOWM3ZjJlMjdjNWZjODM2NjUxYThmM2Y0NSJ9fX0="))
-                .setName(guiLayout.getMessage("Items.Add.Name"))
-                .toItemStack();
-        add = NBTEditor.set(add, "add", "action");
-        gui.setItem(getCenterSlot() + 2, add);
+		ItemStack add = new ItemBuilder(SkullUtils.itemFromBase64("eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNjFkMGY4MmEyYTRjZGQ4NWY3OWY0ZDlkOTc5OGY5YzNhNWJjY2JlOWM3ZjJlMjdjNWZjODM2NjUxYThmM2Y0NSJ9fX0=")).setName(guiLayout.getMessage("Items.Add.Name"))
+				.toItemStack();
+		add = NBTEditor.set(add, "add", NBTEditor.CUSTOM_DATA, "action");
+		gui.setItem(getCenterSlot() + 2, add);
 
-        ItemStack substract = new ItemBuilder(SkullCreator.itemFromBase64("eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZWRmNWMyZjg5M2JkM2Y4OWNhNDA3MDNkZWQzZTQyZGQwZmJkYmE2ZjY3NjhjODc4OWFmZGZmMWZhNzhiZjYifX19"))
-                .setName(guiLayout.getMessage("Items.Substract.Name"))
-                .toItemStack();
-        substract = NBTEditor.set(substract, "substract", "action");
-        gui.setItem(getCenterSlot() - 2, substract);
+		ItemStack substract = new ItemBuilder(SkullUtils.itemFromBase64("eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZWRmNWMyZjg5M2JkM2Y4OWNhNDA3MDNkZWQzZTQyZGQwZmJkYmE2ZjY3NjhjODc4OWFmZGZmMWZhNzhiZjYifX19")).setName(guiLayout.getMessage("Items.Substract.Name"))
+				.toItemStack();
+		substract = NBTEditor.set(substract, "substract", NBTEditor.CUSTOM_DATA, "action");
+		gui.setItem(getCenterSlot() - 2, substract);
 
-        openInventory();
+		openInventory();
 
-    }
+	}
 
-    @Override
-    public void OnMenuClick(InventoryClickEvent event) {
+	@Override
+	public void OnMenuClick(InventoryClickEvent event) {
 
-        if (event.getCurrentItem() == null) return;
+		if (event.getCurrentItem() == null) return;
 
-        Player player = getOwner();
-        String action = NBTEditor.getString(event.getCurrentItem(), "action");
+		Player player = getOwner();
+		String action = NBTEditor.getString(event.getCurrentItem(), NBTEditor.CUSTOM_DATA, "action");
 
-        if(event.getClick() == ClickType.DOUBLE_CLICK) return;
+		if (event.getClick() == ClickType.DOUBLE_CLICK) return;
 
-        if(action == null) return;
+		if (action == null) return;
 
-        GiftGuiSession giftGuiSession = (GiftGuiSession) getAttribute(AttrType.GIFT_GUISESSION_ATTR);
+		GiftGuiSession giftGuiSession = (GiftGuiSession) getAttribute(AttrType.GIFT_GUISESSION_ATTR);
 
-        switch (action) {
+		switch (action) {
 
-            case "send":
+			case "send":
 
-                player.sendMessage(Utils.translate(getMain().getLanguageHandler().getMessage("Commands.Cubelets.Gift.Gifted")
-                        .replaceAll("%amount%", String.valueOf(giftGuiSession.getCubeletAmount()))
-                        .replaceAll("%cubelet%", Utils.removeColors(giftGuiSession.getCubeletType().getName()))
-                        .replaceAll("%player%", giftGuiSession.getTargetName())
-                ));
+				player.sendMessage(Utils.translate(getMain().getLanguageHandler()
+						.getMessage("Commands.Cubelets.Gift.Gifted")
+						.replaceAll("%amount%", String.valueOf(giftGuiSession.getCubeletAmount()))
+						.replaceAll("%cubelet%", Utils.removeColors(giftGuiSession.getCubeletType().getName()))
+						.replaceAll("%player%", giftGuiSession.getTargetName())));
 
-                Player target = Bukkit.getPlayer(giftGuiSession.getTarget());
+				Player target = Bukkit.getPlayer(giftGuiSession.getTarget());
 
-                if(target != null) {
+				if (target != null) {
 
-                    target.sendMessage(Utils.translate(getMain().getLanguageHandler().getMessage("Commands.Cubelets.Gift.Received")
-                            .replaceAll("%amount%", String.valueOf(giftGuiSession.getCubeletAmount()))
-                            .replaceAll("%cubelet%", Utils.removeColors(giftGuiSession.getCubeletType().getName()))
-                            .replaceAll("%player%", player.getName())
-                    ));
+					target.sendMessage(Utils.translate(getMain().getLanguageHandler()
+							.getMessage("Commands.Cubelets.Gift.Received")
+							.replaceAll("%amount%", String.valueOf(giftGuiSession.getCubeletAmount()))
+							.replaceAll("%cubelet%", Utils.removeColors(giftGuiSession.getCubeletType().getName()))
+							.replaceAll("%player%", player.getName())));
 
-                }
+				}
 
-                playSound(SoundType.NOTE_PLING);
+				playSound(SoundType.NOTE_PLING);
 
-                getMain().getTransactionHandler().transferCubelets(player.getUniqueId(),
-                        giftGuiSession.getTarget(),
-                        giftGuiSession.getCubeletType(),
-                        giftGuiSession.getCubeletAmount());
+				getMain().getTransactionHandler()
+						.transferCubelets(player.getUniqueId(), giftGuiSession.getTarget(), giftGuiSession.getCubeletType(), giftGuiSession.getCubeletAmount());
 
-                player.closeInventory();
+				player.closeInventory();
 
-                break;
+				break;
 
-            case "add":
+			case "add":
 
-                if(giftGuiSession.getCubeletAmount() < giftGuiSession.getAvailable()) {
+				if (giftGuiSession.getCubeletAmount() < giftGuiSession.getAvailable()) {
 
-                    giftGuiSession.setCubeletAmount(giftGuiSession.getCubeletAmount() + 1);
+					giftGuiSession.setCubeletAmount(giftGuiSession.getCubeletAmount() + 1);
 
-                    reloadMyMenu();
+					reloadMyMenu();
 
-                    playSound(SoundType.CLICK);
+					playSound(SoundType.CLICK);
 
-                }
+				}
 
-                break;
+				break;
 
-            case "substract":
+			case "substract":
 
-                if(giftGuiSession.getCubeletAmount() > 1) {
+				if (giftGuiSession.getCubeletAmount() > 1) {
 
-                    giftGuiSession.setCubeletAmount(giftGuiSession.getCubeletAmount() - 1);
+					giftGuiSession.setCubeletAmount(giftGuiSession.getCubeletAmount() - 1);
 
-                    reloadMyMenu();
+					reloadMyMenu();
 
-                    playSound(SoundType.CLICK);
+					playSound(SoundType.CLICK);
 
-                }
+				}
 
-                break;
+				break;
 
-            case "back":
+			case "back":
 
-                GiftMenu giftMenu = new GiftMenu(getMain(), player);
-                giftMenu.setAttribute(AttrType.GIFT_GUISESSION_ATTR, giftGuiSession);
+				GiftMenu giftMenu = new GiftMenu(getMain(), player);
+				giftMenu.setAttribute(AttrType.GIFT_GUISESSION_ATTR, giftGuiSession);
 
-                break;
+				break;
 
-        }
+		}
 
-    }
+	}
 
-    @Override
-    public void OnMenuClosed() { }
+	@Override
+	public void OnMenuClosed() {
+	}
 
 }

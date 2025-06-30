@@ -22,169 +22,176 @@ import java.util.Optional;
 
 public class Event_Interact implements Listener {
 
-    private Main main;
-    public Event_Interact(Main main) {
-        this.main = main;
-    }
+	private final Main main;
 
-    @EventHandler
-    public void onInteract(PlayerInteractEvent e) {
+	public Event_Interact(Main main) {
+		this.main = main;
+	}
 
-        Player player = e.getPlayer();
-        Action action = e.getAction();
+	@EventHandler
+	public void onInteract(PlayerInteractEvent e) {
 
-        ItemStack item = e.getItem();
+		Player player = e.getPlayer();
+		Action action = e.getAction();
 
-        if(action == Action.RIGHT_CLICK_AIR || action == Action.LEFT_CLICK_AIR || action == Action.RIGHT_CLICK_BLOCK || action == Action.LEFT_CLICK_BLOCK) {
+		ItemStack item = e.getItem();
 
-            if(item != null) {
+		if (action == Action.RIGHT_CLICK_AIR || action == Action.LEFT_CLICK_AIR || action == Action.RIGHT_CLICK_BLOCK || action == Action.LEFT_CLICK_BLOCK) {
 
-                if (NBTEditor.contains(item, "keyType"))
-                    e.setCancelled(true);
+			if (item != null) {
 
-            }
+				if (NBTEditor.contains(item, NBTEditor.CUSTOM_DATA, "keyType")) e.setCancelled(true);
+			}
 
-        }
+		}
 
-        if(item == null || !NBTEditor.contains(item, "keyType") || !main.isSetting("UseKeys")) {
+		if (item == null || !NBTEditor.contains(item, NBTEditor.CUSTOM_DATA, "keyType") || !main.isSetting("UseKeys")) {
 
-            if(main.getCubeletBoxHandler().isClickType(action)) {
+			if (main.getCubeletBoxHandler().isClickType(action)) {
 
-                if (main.getCubeletBoxHandler().getMachines().containsKey(e.getClickedBlock().getLocation())) {
+				if (main.getCubeletBoxHandler().getMachines().containsKey(e.getClickedBlock().getLocation())) {
 
-                    e.setCancelled(true);
+					e.setCancelled(true);
 
-                    if (e.getHand() != EquipmentSlot.HAND) return;
+					if (e.getHand() != EquipmentSlot.HAND) return;
 
-                    CubeletMachine box = main.getCubeletBoxHandler().getMachineByLocation(e.getClickedBlock().getLocation());
+					CubeletMachine box = main.getCubeletBoxHandler()
+							.getMachineByLocation(e.getClickedBlock().getLocation());
 
-                    if (box.isWaiting()) {
-                        main.getPlayerDataHandler().getData(player).setBoxOpened(box);
+					if (box.isWaiting()) {
+						main.getPlayerDataHandler().getData(player).setBoxOpened(box);
 
-                        if (!main.isSetting("NoGuiMode")) {
+						if (!main.isSetting("NoGuiMode")) {
 
-                            new CubeletsMenu(main, player).open();
+							new CubeletsMenu(main, player).open();
 
-                        } else {
+						} else {
 
-                            Profile profile = main.getPlayerDataHandler().getData(player.getUniqueId());
-                            List<Cubelet> cubelets = profile.getCubelets();
-                            cubelets.sort(new CubeletDateComparator());
+							Profile profile = main.getPlayerDataHandler().getData(player.getUniqueId());
+							List<Cubelet> cubelets = profile.getCubelets();
+							cubelets.sort(new CubeletDateComparator());
 
-                            Optional<Cubelet> optionalCubelet = cubelets.stream().findFirst();
+							Optional<Cubelet> optionalCubelet = cubelets.stream().findFirst();
 
-                            if (optionalCubelet.isPresent()) {
+							if (optionalCubelet.isPresent()) {
 
-                                Cubelet cubelet = optionalCubelet.get();
+								Cubelet cubelet = optionalCubelet.get();
 
-                                if (cubelet.getExpire() > System.currentTimeMillis() || cubelet.getExpire() == -1) {
+								if (cubelet.getExpire() > System.currentTimeMillis() || cubelet.getExpire() == -1) {
 
-                                    CubeletType type = main.getCubeletTypesHandler().getTypeBydId(cubelet.getType());
+									CubeletType type = main.getCubeletTypesHandler().getTypeBydId(cubelet.getType());
 
-                                    if (type.getAllRewards().size() > 0) {
+									if (type.getAllRewards().size() > 0) {
 
-                                        main.getCubeletOpenHandler().openAnimation(player, profile.getBoxOpened(), type, false);
+										main.getCubeletOpenHandler()
+												.openAnimation(player, profile.getBoxOpened(), type, false);
 
-                                        main.getDatabaseHandler().removeCubelet(player.getUniqueId(), cubelet.getUuid());
+										main.getDatabaseHandler()
+												.removeCubelet(player.getUniqueId(), cubelet.getUuid());
 
-                                        profile.getCubelets().remove(cubelet);
-                                        main.getHologramImplementation().reloadHolograms(player);
+										profile.getCubelets().remove(cubelet);
+										main.getHologramImplementation().reloadHolograms(player);
 
-                                    }
+									}
 
-                                }
+								}
 
-                            }
+							}
 
-                        }
+						}
 
-                    } else {
+					} else {
 
-                        if (box.getPlayerOpening().getUuid() == player.getUniqueId()) {
-                            if(!main.getLanguageHandler().isEmptyMessage("Cubelet.BoxInUse.Me"))
-                                player.sendMessage(main.getLanguageHandler().getMessage("Cubelet.BoxInUse.Me"));
-                        } else {
-                            if(!main.getLanguageHandler().isEmptyMessage("Cubelet.BoxInUse.Other"))
-                                player.sendMessage(main.getLanguageHandler().getMessage("Cubelet.BoxInUse.Other").replaceAll("%player%", box.getPlayerOpening().getName()));
-                        }
-                    }
+						if (box.getPlayerOpening().getUuid() == player.getUniqueId()) {
+							if (!main.getLanguageHandler().isEmptyMessage("Cubelet.BoxInUse.Me"))
+								player.sendMessage(main.getLanguageHandler().getMessage("Cubelet.BoxInUse.Me"));
+						} else {
+							if (!main.getLanguageHandler().isEmptyMessage("Cubelet.BoxInUse.Other"))
+								player.sendMessage(main.getLanguageHandler()
+										.getMessage("Cubelet.BoxInUse.Other")
+										.replaceAll("%player%", box.getPlayerOpening().getName()));
+						}
+					}
 
-                }
+				}
 
-            }
+			}
 
-        } else {
+		} else {
 
-            if(main.getCubeletBoxHandler().isClickType(action)) {
+			if (main.getCubeletBoxHandler().isClickType(action)) {
 
-                if (main.getCubeletBoxHandler().getMachines().containsKey(e.getClickedBlock().getLocation())) {
+				if (main.getCubeletBoxHandler().getMachines().containsKey(e.getClickedBlock().getLocation())) {
 
-                    e.setCancelled(true);
+					e.setCancelled(true);
 
-                    if (e.getHand() != EquipmentSlot.HAND) return;
+					if (e.getHand() != EquipmentSlot.HAND) return;
 
-                    String typeID = NBTEditor.getString(item, "keyType");
+					String typeID = NBTEditor.getString(item, NBTEditor.CUSTOM_DATA, "keyType");
 
-                    if(action == Action.LEFT_CLICK_BLOCK) {
+					if (action == Action.LEFT_CLICK_BLOCK) {
 
-                        if(main.isSetting("Rewards.Preview.Enabled")) {
+						if (main.isSetting("Rewards.Preview.Enabled")) {
 
-                            RewardsPreviewMenu rewardsPreviewMenu = new RewardsPreviewMenu(Main.get(), player);
-                            rewardsPreviewMenu.setAttribute(Menu.AttrType.CUSTOM_ID_ATTR, typeID);
-                            rewardsPreviewMenu.setAttribute(Menu.AttrType.OPENED_EXTERNALLY_ATTR, Boolean.TRUE);
-                            rewardsPreviewMenu.open();
+							RewardsPreviewMenu rewardsPreviewMenu = new RewardsPreviewMenu(Main.get(), player);
+							rewardsPreviewMenu.setAttribute(Menu.AttrType.CUSTOM_ID_ATTR, typeID);
+							rewardsPreviewMenu.setAttribute(Menu.AttrType.OPENED_EXTERNALLY_ATTR, Boolean.TRUE);
+							rewardsPreviewMenu.open();
 
-                        }
+						}
 
-                    } else {
+					} else {
 
-                        CubeletMachine box = main.getCubeletBoxHandler().getMachineByLocation(e.getClickedBlock().getLocation());
+						CubeletMachine box = main.getCubeletBoxHandler()
+								.getMachineByLocation(e.getClickedBlock().getLocation());
 
-                        if (box.isWaiting()) {
+						if (box.isWaiting()) {
 
-                            CubeletType type = main.getCubeletTypesHandler().getTypeBydId(typeID);
+							CubeletType type = main.getCubeletTypesHandler().getTypeBydId(typeID);
 
-                            if (type.getAllRewards().size() > 0) {
+							if (type.getAllRewards().size() > 0) {
 
-                                main.getCubeletOpenHandler().openAnimation(player, box, type, true);
+								main.getCubeletOpenHandler().openAnimation(player, box, type, true);
 
-                                item.setAmount(item.getAmount() - 1);
+								item.setAmount(item.getAmount() - 1);
 
-                                Bukkit.getScheduler().runTaskLater(main, () -> player.updateInventory(), 20L);
+								Bukkit.getScheduler().runTaskLater(main, () -> player.updateInventory(), 20L);
 
-                                main.getHologramImplementation().reloadHolograms(player);
+								main.getHologramImplementation().reloadHolograms(player);
 
-                            }
+							}
 
-                        } else {
-                            if (box.getPlayerOpening().getUuid() == player.getUniqueId()) {
-                                if(!main.getLanguageHandler().isEmptyMessage("Cubelet.BoxInUse.Me"))
-                                    player.sendMessage(main.getLanguageHandler().getMessage("Cubelet.BoxInUse.Me"));
-                            } else {
-                                if(!main.getLanguageHandler().isEmptyMessage("Cubelet.BoxInUse.Other"))
-                                    player.sendMessage(main.getLanguageHandler().getMessage("Cubelet.BoxInUse.Other").replaceAll("%player%", box.getPlayerOpening().getName()));
-                            }
-                        }
+						} else {
+							if (box.getPlayerOpening().getUuid() == player.getUniqueId()) {
+								if (!main.getLanguageHandler().isEmptyMessage("Cubelet.BoxInUse.Me"))
+									player.sendMessage(main.getLanguageHandler().getMessage("Cubelet.BoxInUse.Me"));
+							} else {
+								if (!main.getLanguageHandler().isEmptyMessage("Cubelet.BoxInUse.Other"))
+									player.sendMessage(main.getLanguageHandler()
+											.getMessage("Cubelet.BoxInUse.Other")
+											.replaceAll("%player%", box.getPlayerOpening().getName()));
+							}
+						}
 
-                    }
+					}
 
-                }
+				}
 
-            }
+			}
 
-        }
+		}
 
-    }
+	}
 
-    @EventHandler
-    public void onArmorStand(PlayerArmorStandManipulateEvent e) {
+	@EventHandler
+	public void onArmorStand(PlayerArmorStandManipulateEvent e) {
 
-        ArmorStand armorStand = e.getRightClicked();
+		ArmorStand armorStand = e.getRightClicked();
 
-        if(!armorStand.hasMetadata("ACUBELETS")) return;
+		if (!armorStand.hasMetadata("ACUBELETS")) return;
 
-        e.setCancelled(true);
+		e.setCancelled(true);
 
-    }
+	}
 
 }

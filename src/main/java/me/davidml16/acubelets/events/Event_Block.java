@@ -13,36 +13,36 @@ import org.bukkit.inventory.ItemStack;
 
 public class Event_Block implements Listener {
 
-    private Main main;
+	private final Main main;
 
-    public Event_Block(Main main) {
-        this.main = main;
-    }
+	public Event_Block(Main main) {
+		this.main = main;
+	}
 
-    @EventHandler(ignoreCancelled = true, priority = EventPriority.HIGHEST)
-    public void onBlockPlace(BlockPlaceEvent event) {
+	@EventHandler( ignoreCancelled = true, priority = EventPriority.HIGHEST )
+	public void onBlockPlace(BlockPlaceEvent event) {
 
-        ItemStack item = event.getItemInHand();
+		ItemStack item = event.getItemInHand();
 
-        if(item == null) return;
+		if (item == null) return;
 
-        if(!NBTEditor.contains(item, "keyType")) return;
+		if (!NBTEditor.contains(item, NBTEditor.CUSTOM_DATA, "keyType")) return;
 
-        event.setCancelled(true);
+		event.setCancelled(true);
 
-        Player player = event.getPlayer();
+		Player player = event.getPlayer();
 
-        if(player == null) return;
+		if (player == null) return;
 
-        Bukkit.getScheduler().runTaskLater(main, () -> player.updateInventory(), 20L);
+		Bukkit.getScheduler().runTaskLater(main, () -> player.updateInventory(), 20L);
 
-    }
+	}
 
-    @EventHandler
-    public void onEntityBlockForm(EntityBlockFormEvent paramEntityBlockFormEvent) {
-        if (paramEntityBlockFormEvent.getEntity().hasMetadata("ACUBELETS")) {
-            paramEntityBlockFormEvent.setCancelled(true);
-        }
-    }
+	@EventHandler
+	public void onEntityBlockForm(EntityBlockFormEvent paramEntityBlockFormEvent) {
+		if (paramEntityBlockFormEvent.getEntity().hasMetadata("ACUBELETS")) {
+			paramEntityBlockFormEvent.setCancelled(true);
+		}
+	}
 
 }

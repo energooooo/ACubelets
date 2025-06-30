@@ -22,244 +22,251 @@ import java.util.Map;
 
 public class CubeletType {
 
-    private Main main;
+	private final Main main;
 
-    private String id;
-    private String name;
+	private String id;
+	private String name;
 
-    private Long expireTime;
+	private Long expireTime;
 
-    private ItemStack icon;
-    private List<String> loreAvailable;
-    private List<String> loreExpired;
-    private List<String> description;
+	private ItemStack icon;
+	private List<String> loreAvailable;
+	private List<String> loreExpired;
+	private List<String> description;
 
-    private String animation;
+	private String animation;
 
-    private Map<String, List<Reward>> rewards;
-    private Map<String, Rarity> rarities;
+	private Map<String, List<Reward>> rewards;
+	private Map<String, Rarity> rarities;
 
-    private ItemStack key;
+	private ItemStack key;
 
-    public CubeletType(Main main, String id, String name) {
-        this.main = main;
-        this.id = id;
-        this.name = name;
-        this.rewards = new HashMap<>();
-        this.rarities = new HashMap<>();
-        this.expireTime = 0L;
-    }
+	public CubeletType(Main main, String id, String name) {
+		this.main = main;
+		this.id = id;
+		this.name = name;
+		this.rewards = new HashMap<>();
+		this.rarities = new HashMap<>();
+		this.expireTime = 0L;
+	}
 
-    public String getId() {
-        return id;
-    }
+	public String getId() {
+		return id;
+	}
 
-    public void setId(String id) {
-        this.id = id;
-    }
+	public void setId(String id) {
+		this.id = id;
+	}
 
-    public String getName() {
-        return name;
-    }
+	public String getName() {
+		return name;
+	}
 
-    public void setName(String name) {
-        this.name = name;
-    }
+	public void setName(String name) {
+		this.name = name;
+	}
 
-    public Map<String, List<Reward>> getRewards() { return rewards; }
+	public Map<String, List<Reward>> getRewards() {
+		return rewards;
+	}
 
-    public List<Reward> getAllRewards() {
-        List<Reward> rewards = new ArrayList<>();
-        List<Rarity> rarities = new ArrayList<>(getRarities().values());
+	public void setRewards(Map<String, List<Reward>> rewards) {
+		this.rewards = rewards;
+	}
 
-        if(main.isSetting("Rewards.AutoSorting")) rarities.sort(new RarityComparator());
+	public List<Reward> getAllRewards() {
+		List<Reward> rewards = new ArrayList<>();
+		List<Rarity> rarities = new ArrayList<>(getRarities().values());
 
-        for (Rarity rarity : rarities) {
+		if (main.isSetting("Rewards.AutoSorting")) rarities.sort(new RarityComparator());
 
-            List<Reward> rarityRewards = new ArrayList<>(getRewards().getOrDefault(rarity.getId(), new ArrayList<>()));
-            if(main.isSetting("Rewards.AutoSorting")) rarityRewards.sort(new RewardComparator());
+		for (Rarity rarity : rarities) {
 
-            rewards.addAll(rarityRewards);
+			List<Reward> rarityRewards = new ArrayList<>(getRewards().getOrDefault(rarity.getId(), new ArrayList<>()));
+			if (main.isSetting("Rewards.AutoSorting")) rarityRewards.sort(new RewardComparator());
 
-        }
+			rewards.addAll(rarityRewards);
 
-        if(!main.isSetting("Rewards.AutoSorting"))
-            rewards.sort(new RewardIDComparator());
+		}
 
-        return rewards;
-    }
+		if (!main.isSetting("Rewards.AutoSorting")) rewards.sort(new RewardIDComparator());
 
-    public Reward getReward(String id) {
-        for(Reward reward : getAllRewards())
-            if(reward.getId().equalsIgnoreCase(id))
-                return reward;
-        return  null;
-    }
+		return rewards;
+	}
 
-    public List<String> getRaritiesIDs() {
-        List<Rarity> rts = new ArrayList<>(getRarities().values());
-        rts.sort(new RarityComparator());
+	public Reward getReward(String id) {
+		for (Reward reward : getAllRewards())
+			if (reward.getId().equalsIgnoreCase(id)) return reward;
+		return null;
+	}
 
-        List<String> rarities = new ArrayList<>();
-        for(Rarity rarity : rts) {
-            rarities.add(rarity.getId());
-        }
+	public List<String> getRaritiesIDs() {
+		List<Rarity> rts = new ArrayList<>(getRarities().values());
+		rts.sort(new RarityComparator());
 
-        return rarities;
-    }
+		List<String> rarities = new ArrayList<>();
+		for (Rarity rarity : rts) {
+			rarities.add(rarity.getId());
+		}
 
-    public void setRewards(Map<String, List<Reward>> rewards) { this.rewards = rewards; }
+		return rarities;
+	}
 
-    public Map<String, Rarity> getRarities() { return rarities; }
+	public Map<String, Rarity> getRarities() {
+		return rarities;
+	}
 
-    public void setRarities(Map<String, Rarity> rarities) { this.rarities = rarities; }
+	public void setRarities(Map<String, Rarity> rarities) {
+		this.rarities = rarities;
+	}
 
-    public ItemStack getIcon() { return icon; }
+	public ItemStack getIcon() {
+		return icon;
+	}
 
-    public void setIcon(ItemStack icon) { this.icon = icon; }
+	public void setIcon(ItemStack icon) {
+		this.icon = icon;
+	}
 
-    public List<String> getLoreAvailable() {
-        return loreAvailable;
-    }
+	public List<String> getLoreAvailable() {
+		return loreAvailable;
+	}
 
-    public void setLoreAvailable(List<String> loreAvailable) {
-        this.loreAvailable = loreAvailable;
-    }
+	public void setLoreAvailable(List<String> loreAvailable) {
+		this.loreAvailable = loreAvailable;
+	}
 
-    public List<String> getLoreExpired() {
-        return loreExpired;
-    }
+	public List<String> getLoreExpired() {
+		return loreExpired;
+	}
 
-    public void setLoreExpired(List<String> loreExpired) {
-        this.loreExpired = loreExpired;
-    }
+	public void setLoreExpired(List<String> loreExpired) {
+		this.loreExpired = loreExpired;
+	}
 
-    public List<String> getDescription() {
-        return description;
-    }
+	public List<String> getDescription() {
+		return description;
+	}
 
-    public void setDescription(List<String> description) {
-        this.description = description;
-    }
+	public void setDescription(List<String> description) {
+		this.description = description;
+	}
 
-    public String getAnimation() {
-        return animation;
-    }
+	public String getAnimation() {
+		return animation;
+	}
 
-    public void setAnimation(String animation) {
-        this.animation = animation;
-    }
+	public void setAnimation(String animation) {
+		this.animation = animation;
+	}
 
-    public Long getExpireTime() {
-        return expireTime;
-    }
-
-    public void setExpireTime(Long expireTime) {
-        this.expireTime = expireTime;
-    }
+	public Long getExpireTime() {
+		return expireTime;
+	}
 
-    public ItemStack getKey() { return key; }
+	public void setExpireTime(Long expireTime) {
+		this.expireTime = expireTime;
+	}
 
-    public void setKey(ItemStack key) { this.key = key; }
+	public ItemStack getKey() {
+		return key;
+	}
 
-    public ItemStack getKeyNBT() {
-        ItemStack key = getKey().clone();
-        key = NBTEditor.set(key, getId(), "keyType");
-        return key;
-    }
+	public void setKey(ItemStack key) {
+		this.key = key;
+	}
 
-    public void addReward(String rarity, Reward reward) {
-        Map<String, List<Reward>> rewardsAll = getRewards();
-        List<Reward> commandRewards;
-        if(getRewards().get(rarity) == null) commandRewards = new ArrayList<>();
-        else commandRewards = getRewards().get(rarity);
-        commandRewards.add(reward);
-        rewardsAll.put(reward.getRarity().getId(), commandRewards);
-        setRewards(rewardsAll);
-    }
+	public ItemStack getKeyNBT() {
+		ItemStack key = getKey().clone();
+		key = NBTEditor.set(key, getId(), NBTEditor.CUSTOM_DATA, "keyType");
+		return key;
+	}
 
-    @Override
-    public String toString() {
-        return "CubeletType{" +
-                "id='" + id + '\'' +
-                ", name='" + name + '\'' +
-                ", icon=" + icon +
-                ", rewards=" + rewards +
-                ", rarities=" + rarities +
-                '}';
-    }
+	public void addReward(String rarity, Reward reward) {
+		Map<String, List<Reward>> rewardsAll = getRewards();
+		List<Reward> commandRewards;
+		if (getRewards().get(rarity) == null) commandRewards = new ArrayList<>();
+		else commandRewards = getRewards().get(rarity);
+		commandRewards.add(reward);
+		rewardsAll.put(reward.getRarity().getId(), commandRewards);
+		setRewards(rewardsAll);
+	}
 
-    public void saveType() {
+	@Override
+	public String toString() {
+		return "CubeletType{" + "id='" + id + '\'' + ", name='" + name + '\'' + ", icon=" + icon + ", rewards=" + rewards + ", rarities=" + rarities + '}';
+	}
 
-        FileConfiguration config = main.getCubeletTypesHandler().getConfig(id);
+	public void saveType() {
 
-        config.set("type.key", null);
-        if(!main.isSetting("SerializeBase64"))
-            XItemStack.serialize(key, Utils.getConfigurationSection(config, "type.key"));
-        else
-            config.set("type.key", ItemStack64.itemStackToBase64(key));
+		FileConfiguration config = main.getCubeletTypesHandler().getConfig(id);
 
-        config.set("type.rarities", new ArrayList<>());
+		config.set("type.key", null);
+		if (!main.isSetting("SerializeBase64"))
+			XItemStack.serialize(key, Utils.getConfigurationSection(config, "type.key"));
+		else config.set("type.key", ItemStack64.itemStackToBase64(key));
 
-        if (config.contains("type.rarities")) {
+		config.set("type.rarities", new ArrayList<>());
 
-            List<Rarity> rts = new ArrayList<>(rarities.values());
-            rts.sort(new RarityComparator());
+		if (config.contains("type.rarities")) {
 
-            for (Rarity rarity : rts) {
-                config.set("type.rarities." + rarity.getId() + ".name", rarity.getName());
-                config.set("type.rarities." + rarity.getId() + ".chance", rarity.getChance());
-                config.set("type.rarities." + rarity.getId() + ".duplicatePointsRange", rarity.getDuplicatePointsRange());
-            }
+			List<Rarity> rts = new ArrayList<>(rarities.values());
+			rts.sort(new RarityComparator());
 
-        }
+			for (Rarity rarity : rts) {
+				config.set("type.rarities." + rarity.getId() + ".name", rarity.getName());
+				config.set("type.rarities." + rarity.getId() + ".chance", rarity.getChance());
+				config.set("type.rarities." + rarity.getId() + ".duplicatePointsRange", rarity.getDuplicatePointsRange());
+			}
 
-        config.set("type.rewards", new ArrayList<>());
+		}
 
-        if (config.contains("type.rewards")) {
+		config.set("type.rewards", new ArrayList<>());
 
-            List<Reward> rewards = getAllRewards();
+		if (config.contains("type.rewards")) {
 
-            for (int i = 0; i < rewards.size(); i++) {
+			List<Reward> rewards = getAllRewards();
 
-                Reward reward = rewards.get(i);
-                config.set("type.rewards.reward_" + i + ".name", reward.getName());
-                config.set("type.rewards.reward_" + i + ".rarity", reward.getRarity().getId());
+			for (int i = 0; i < rewards.size(); i++) {
 
-                config.set("type.rewards.reward_" + i + ".rewardUUID", reward.getRewardUUID().toString());
-                config.set("type.rewards.reward_" + i + ".bypassDuplicationSystem", reward.isBypassDuplicationSystem());
+				Reward reward = rewards.get(i);
+				config.set("type.rewards.reward_" + i + ".name", reward.getName());
+				config.set("type.rewards.reward_" + i + ".rarity", reward.getRarity().getId());
 
-                List<String> commands = new ArrayList<>();
-                for(CommandObject command : reward.getCommands())
-                    commands.add(command.getCommand());
-                config.set("type.rewards.reward_" + i + ".command", commands);
+				config.set("type.rewards.reward_" + i + ".rewardUUID", reward.getRewardUUID().toString());
+				config.set("type.rewards.reward_" + i + ".bypassDuplicationSystem", reward.isBypassDuplicationSystem());
 
-                List<String> permissions = new ArrayList<>();
-                for(PermissionObject permission : reward.getPermissions())
-                    permissions.add(permission.getPermission());
-                config.set("type.rewards.reward_" + i + ".permission", permissions);
+				List<String> commands = new ArrayList<>();
+				for (CommandObject command : reward.getCommands())
+					commands.add(command.getCommand());
+				config.set("type.rewards.reward_" + i + ".command", commands);
 
+				List<String> permissions = new ArrayList<>();
+				for (PermissionObject permission : reward.getPermissions())
+					permissions.add(permission.getPermission());
+				config.set("type.rewards.reward_" + i + ".permission", permissions);
 
-                List<ItemObject> itemObjects = reward.getItems();
-                config.set("type.rewards.reward_" + i + ".item", new ArrayList<>());
-                for (int j = 0; j < itemObjects.size(); j++) {
-                    if(!main.isSetting("SerializeBase64"))
-                        XItemStack.serialize(itemObjects.get(j).getItemStack(), Utils.getConfigurationSection(config, "type.rewards.reward_" + i + ".item.item_" + j));
-                    else
-                        config.set("type.rewards.reward_" + i + ".item.item_" + j, ItemStack64.itemStackToBase64(itemObjects.get(j).getItemStack()));
-                }
 
-                if(!main.isSetting("SerializeBase64"))
-                    XItemStack.serialize(reward.getIcon(), Utils.getConfigurationSection(config, "type.rewards.reward_" + i + ".icon"));
-                else
-                    config.set("type.rewards.reward_" + i + ".icon", ItemStack64.itemStackToBase64(reward.getIcon()));
+				List<ItemObject> itemObjects = reward.getItems();
+				config.set("type.rewards.reward_" + i + ".item", new ArrayList<>());
+				for (int j = 0; j < itemObjects.size(); j++) {
+					if (!main.isSetting("SerializeBase64")) XItemStack.serialize(itemObjects.get(j)
+							.getItemStack(), Utils.getConfigurationSection(config, "type.rewards.reward_" + i + ".item.item_" + j));
+					else
+						config.set("type.rewards.reward_" + i + ".item.item_" + j, ItemStack64.itemStackToBase64(itemObjects.get(j)
+								.getItemStack()));
+				}
 
-            }
+				if (!main.isSetting("SerializeBase64"))
+					XItemStack.serialize(reward.getIcon(), Utils.getConfigurationSection(config, "type.rewards.reward_" + i + ".icon"));
+				else config.set("type.rewards.reward_" + i + ".icon", ItemStack64.itemStackToBase64(reward.getIcon()));
 
-        }
+			}
 
-        main.getCubeletTypesHandler().saveConfig(id);
+		}
 
-    }
+		main.getCubeletTypesHandler().saveConfig(id);
+
+	}
 
 }

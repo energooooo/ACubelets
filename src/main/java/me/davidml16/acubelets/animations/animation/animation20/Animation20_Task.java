@@ -6,7 +6,6 @@ import com.comphenix.protocol.ProtocolManager;
 import com.comphenix.protocol.events.PacketContainer;
 import com.comphenix.protocol.wrappers.BlockPosition;
 import com.cryptomorin.xseries.XMaterial;
-import io.github.bananapuncher714.nbteditor.NBTEditor;
 import me.davidml16.acubelets.Main;
 import me.davidml16.acubelets.animations.Animation;
 import me.davidml16.acubelets.animations.AnimationSettings;
@@ -32,19 +31,20 @@ import java.util.Arrays;
 
 public class Animation20_Task extends Animation {
 
+	private Location rotationLocation;
+	private LivingEntity enderman;
 	public Animation20_Task(Main main, AnimationSettings animationSettings) {
 		super(main, animationSettings);
 	}
 
-	private Location rotationLocation;
-	private LivingEntity enderman;
-
 	@Override
 	public void onTick(int time) {
 
-		if(time == 50) {
+		if (time == 50) {
 
-			enderman = (LivingEntity) getCubeletBox().getLocation().getWorld().spawnEntity(rotationLocation, EntityType.ENDERMAN);
+			enderman = (LivingEntity) getCubeletBox().getLocation()
+					.getWorld()
+					.spawnEntity(rotationLocation, EntityType.ENDERMAN);
 
 			UtilParticles.display(Particles.FIREWORKS_SPARK, 0.35, 0.1, 0.35, enderman.getLocation(), 10);
 
@@ -52,32 +52,32 @@ public class Animation20_Task extends Animation {
 
 			enderman.setCollidable(false);
 
-			((Enderman)enderman).setCarriedBlock(Bukkit.createBlockData(XMaterial.CHEST.parseMaterial()));
+			((Enderman) enderman).setCarriedBlock(Bukkit.createBlockData(XMaterial.CHEST.parseMaterial()));
 
 			enderman.setRemoveWhenFarAway(false);
 			enderman.setMetadata("ACUBELETS", new FixedMetadataValue(getMain(), Boolean.TRUE));
 
-			NBTEditor.set( enderman, ( byte ) 1, "NoAI" );
-			NBTEditor.set( enderman, ( byte ) 1, "Silent" );
-			NBTEditor.set( enderman, ( byte ) 1, "Invulnerable" );
+			enderman.setAI(false);
+			enderman.setSilent(true);
+			enderman.setInvulnerable(true);
+		}
+
+		if (time > 50 && time < 90) {
+
+			if (enderman != null) enderman.teleport(rotationLocation);
 
 		}
 
-		if(time > 50 && time < 90) {
+		if (time == 70) {
 
-			if(enderman != null)
-				enderman.teleport(rotationLocation);
-
-		}
-
-		if(time == 70) {
-
-			if(enderman != null)
-					((Enderman)enderman).setCarriedBlock(Bukkit.createBlockData(XMaterial.AIR.parseMaterial()));
+			if (enderman != null)
+				((Enderman) enderman).setCarriedBlock(Bukkit.createBlockData(XMaterial.AIR.parseMaterial()));
 
 			Location eye = getBoxLocation().clone().add(0.0D, 0.4D, 0.0D);
-			for (Location location2 : LocationUtils.getCircle(getBoxLocation().clone().add(0, 0.75,0), 0.25D, 50)) {
-				Vector direction = location2.toVector().subtract(getBoxLocation().clone().add(0, 0.75,0).toVector()).normalize();
+			for (Location location2 : LocationUtils.getCircle(getBoxLocation().clone().add(0, 0.75, 0), 0.25D, 50)) {
+				Vector direction = location2.toVector()
+						.subtract(getBoxLocation().clone().add(0, 0.75, 0).toVector())
+						.normalize();
 				UtilParticles.display(Particles.CLOUD, direction, eye, 0.3F);
 			}
 
@@ -86,9 +86,9 @@ public class Animation20_Task extends Animation {
 
 		}
 
-		if(time == 90) {
+		if (time == 90) {
 
-			if(enderman != null) {
+			if (enderman != null) {
 
 				UtilParticles.display(Particles.FIREWORKS_SPARK, 0.35, 0.1, 0.35, enderman.getLocation(), 10);
 				enderman.remove();
@@ -100,12 +100,12 @@ public class Animation20_Task extends Animation {
 		}
 
 
-		if(time == 120) {
+		if (time == 120) {
 
 			setChestOpened(getBoxLocation().getBlock(), true);
 			Sounds.playSound(getCubeletBox().getLocation(), Sounds.MySound.CHEST_OPEN, 0.5F, 1F);
 
-		} else if(time == 123) {
+		} else if (time == 123) {
 
 			doPreRewardReveal();
 
@@ -135,12 +135,10 @@ public class Animation20_Task extends Animation {
 	@Override
 	public void onPreRewardReveal() {
 
-		getMain().getFireworkUtil().spawn(
-				getCubeletBox().getLocation().clone().add(0.5, 0.35, 0.5),
-				FireworkEffect.Type.BALL_LARGE,
-				getColors().get(0),
-				getColors().get(1)
-		);
+		getMain().getFireworkUtil()
+				.spawn(getCubeletBox().getLocation()
+						.clone()
+						.add(0.5, 0.35, 0.5), FireworkEffect.Type.BALL_LARGE, getColors().get(0), getColors().get(1));
 
 	}
 
@@ -150,7 +148,8 @@ public class Animation20_Task extends Animation {
 	}
 
 	@Override
-	public void onRewardDuplication() {}
+	public void onRewardDuplication() {
+	}
 
 	public void placeOrientedChest(Location loc) {
 
@@ -171,9 +170,7 @@ public class Animation20_Task extends Animation {
 				break;
 		}
 
-		getAnimationBlocks().setStepFakeBlocks(1, new FakeBlock[] {
-				new FakeBlock(loc, XMaterial.CHEST, blockFace)
-		});
+		getAnimationBlocks().setStepFakeBlocks(1, new FakeBlock[]{ new FakeBlock(loc, XMaterial.CHEST, blockFace) });
 
 	}
 
@@ -192,5 +189,5 @@ public class Animation20_Task extends Animation {
 			}
 		}
 	}
-	
+
 }

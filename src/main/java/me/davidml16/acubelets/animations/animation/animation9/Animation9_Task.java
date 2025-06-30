@@ -20,17 +20,15 @@ import java.util.Random;
 
 public class Animation9_Task extends Animation {
 
-	public Animation9_Task(Main main, AnimationSettings animationSettings) {
-		super(main, animationSettings);
-	}
-
 	private ArmorStand armorStand;
-
 	private double boxLocIncrease = -1.25;
 	private double circleSize = 0.0D;
 	private int circleStep = 0;
-
 	private float rotation;
+
+	public Animation9_Task(Main main, AnimationSettings animationSettings) {
+		super(main, animationSettings);
+	}
 
 	@Override
 	public void onTick(int time) {
@@ -53,13 +51,10 @@ public class Animation9_Task extends Animation {
 			Location newBoxLoc = getBoxLocation().clone();
 			newBoxLoc.add(0.0D, this.boxLocIncrease, 0.0D);
 
-			if (time <= 40)
-				this.circleSize += 0.07D;
-			else
-				this.circleSize -= 0.075D;
+			if (time <= 40) this.circleSize += 0.07D;
+			else this.circleSize -= 0.075D;
 
-			if (this.circleSize < 0.0D)
-				this.circleSize = 0.0D;
+			if (this.circleSize < 0.0D) this.circleSize = 0.0D;
 
 			List<Location> teleportLocs = LocationUtils.getCircle(newBoxLoc, this.circleSize, 50);
 			Location teleportLoc = teleportLocs.get(this.circleStep).clone();
@@ -73,18 +68,15 @@ public class Animation9_Task extends Animation {
 
 			this.circleStep++;
 
-			if (this.circleStep == teleportLocs.size())
-				this.circleStep = 0;
+			if (this.circleStep == teleportLocs.size()) this.circleStep = 0;
 
 		}
 
-		if(time == 65)
-			chargeParticles();
+		if (time == 65) chargeParticles();
 
-		if(time == 100)
-			cancelRunnable("music");
+		if (time == 100) cancelRunnable("music");
 
-		if(time == 105) {
+		if (time == 105) {
 
 			doPreRewardReveal();
 
@@ -97,7 +89,8 @@ public class Animation9_Task extends Animation {
 
 		rotation = getRotation(false).value;
 
-		armorStand = ASSpawner.spawn(getMain(), getCubeletBox(), getCubeletType(), false, false, getBoxLocation().clone().add(0, -1.25, 0));
+		armorStand = ASSpawner.spawn(getMain(), getCubeletBox(), getCubeletType(), false, false, getBoxLocation().clone()
+				.add(0, -1.25, 0));
 		getMain().getAnimationHandler().getEntities().add(armorStand);
 
 		addRunnable("music", new Animation9_Music(getCubeletBox().getLocation()));
@@ -115,8 +108,8 @@ public class Animation9_Task extends Animation {
 
 		cancelRunnables();
 
-		if(getMain().getAnimationHandler().getEntities().contains(armorStand)) {
-			if(armorStand != null) armorStand.remove();
+		if (getMain().getAnimationHandler().getEntities().contains(armorStand)) {
+			if (armorStand != null) armorStand.remove();
 			getMain().getAnimationHandler().getEntities().remove(armorStand);
 		}
 
@@ -124,15 +117,18 @@ public class Animation9_Task extends Animation {
 
 	@Override
 	public void onPreRewardReveal() {
+		if (getMain().getAnimationHandler().getEntities().contains(armorStand)) {
+			armorStand.remove();
+			getMain().getAnimationHandler().getEntities().remove(armorStand);
+		}
 
-		getMain().getFireworkUtil().spawn(
-				armorStand.getLocation().clone().add(0, 1.75, 0),
-				FireworkEffect.Type.BALL,
-				getColors().get(0),
-				getColors().get(1)
-		);
+		getMain().getFireworkUtil()
+				.spawn(armorStand.getLocation()
+						.clone()
+						.add(0, 1.55, 0), FireworkEffect.Type.BALL, getColors().get(0), getColors().get(1));
 
 		Sounds.playSound(armorStand.getLocation(), Sounds.MySound.EXPLODE, 0.5F, 1F);
+
 
 	}
 
@@ -144,7 +140,8 @@ public class Animation9_Task extends Animation {
 	}
 
 	@Override
-	public void onRewardDuplication() {}
+	public void onRewardDuplication() {
+	}
 
 	private void chargeParticles() {
 
@@ -159,11 +156,11 @@ public class Animation9_Task extends Animation {
 			Vector vector = randomLoc.toVector().subtract(loc.toVector()).normalize();
 			Vector direction = vector.multiply(1.5D + new Random().nextDouble() * 5.0D);
 
-			for(int j = 0; j < 3; j++)
+			for (int j = 0; j < 3; j++)
 				UtilParticles.display(Particles.ENCHANTMENT_TABLE, direction, loc, 5);
 
 		}
 
 	}
-	
+
 }

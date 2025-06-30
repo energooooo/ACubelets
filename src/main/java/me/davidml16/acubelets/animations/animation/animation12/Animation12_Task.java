@@ -1,7 +1,6 @@
 package me.davidml16.acubelets.animations.animation.animation12;
 
 import com.cryptomorin.xseries.XMaterial;
-import io.github.bananapuncher714.nbteditor.NBTEditor;
 import me.davidml16.acubelets.Main;
 import me.davidml16.acubelets.animations.ASSpawner;
 import me.davidml16.acubelets.animations.Animation;
@@ -24,70 +23,72 @@ import java.util.concurrent.ThreadLocalRandom;
 
 public class Animation12_Task extends Animation {
 
+	private final List<ItemStack> wools = new ArrayList<>();
+	private final Set<Animation12_Orbit> orbits = new HashSet<>();
+	private ArmorStand glassStand, liquidStand;
+	private Location glassLocation, liquidLocation;
+	private int actualWool = 0;
+	private LivingEntity witch;
+	private Location witchLocation;
+	private double rotSpeed = 0.001;
+
 	public Animation12_Task(Main main, AnimationSettings animationSettings) {
 		super(main, animationSettings);
 	}
 
-	private ArmorStand glassStand, liquidStand;
-	private Location glassLocation, liquidLocation;
-
-	private List<ItemStack> wools = new ArrayList<>();
-	private int actualWool = 0;
-
-	private Set<Animation12_Orbit> orbits = new HashSet<>();
-
-	private LivingEntity witch;
-	private Location witchLocation;
-
-	private double rotSpeed = 0.001;
-
 	@Override
 	public void onTick(int time) {
 
-		if(time == 45) {
+		if (time == 45) {
 
-			glassStand = ASSpawner.spawn(getMain(), getCubeletBox().getLocation().clone().add(0.5, -1.1, 0.5), XMaterial.GLASS.parseItem(), false, false, false);
+			glassStand = ASSpawner.spawn(getMain(), getCubeletBox().getLocation()
+					.clone()
+					.add(0.5, -1.1, 0.5), XMaterial.GLASS.parseItem(), false, false, false);
 			glassLocation = glassStand.getLocation();
 			getMain().getAnimationHandler().getEntities().add(glassStand);
 
-			liquidStand = ASSpawner.spawn(getMain(), getCubeletBox().getLocation().clone().add(0.5, -0.3, 0.5), XMaterial.RED_WOOL.parseItem(), false, false, true);
+			liquidStand = ASSpawner.spawn(getMain(), getCubeletBox().getLocation()
+					.clone()
+					.add(0.5, -0.3, 0.5), XMaterial.RED_WOOL.parseItem(), false, false, true);
 			liquidLocation = liquidStand.getLocation();
 			getMain().getAnimationHandler().getEntities().add(liquidStand);
 
-			witch = (LivingEntity) getCubeletBox().getLocation().getWorld().spawnEntity(getLocationRotation(0), EntityType.WITCH);
+			witch = (LivingEntity) getCubeletBox().getLocation()
+					.getWorld()
+					.spawnEntity(getLocationRotation(0), EntityType.WITCH);
 
 			witch.setCollidable(false);
 			witch.setRemoveWhenFarAway(false);
 			witch.setMetadata("ACUBELETS", new FixedMetadataValue(getMain(), Boolean.TRUE));
 
-			NBTEditor.set(witch, (byte) 1, "Silent");
-			NBTEditor.set(witch, (byte) 1, "Invulnerable");
-			NBTEditor.set(witch, (byte) 1, "NoAI");
+			witch.setAI(false);
+			witch.setInvulnerable(true);
+			witch.setSilent(true);
 
 			witchLocation = witch.getLocation();
 			witchLocation.setYaw(getCubeletBox().getRotation().value);
 			witchLocation.setPitch(0);
 			witch.teleport(witchLocation);
 
-			Animation12_Orbit orbit1 = new Animation12_Orbit(getMain(), glassLocation.clone().add(0, 3.5, 0), 3, 90, true, 0);
+			Animation12_Orbit orbit1 = new Animation12_Orbit(getMain(), glassLocation.clone()
+					.add(0, 3.5, 0), 3, 90, true, 0);
 			orbit1.runTaskTimer(getMain(), 0L, 1L);
 			orbits.add(orbit1);
 
-			Animation12_Orbit orbit2 = new Animation12_Orbit(getMain(), glassLocation.clone().add(0, 3.5, 0), 3, 90, true, 45);
+			Animation12_Orbit orbit2 = new Animation12_Orbit(getMain(), glassLocation.clone()
+					.add(0, 3.5, 0), 3, 90, true, 45);
 			orbit2.runTaskTimer(getMain(), 0L, 1L);
 			orbits.add(orbit2);
 
 		}
 
-		if(time > 45 && time < 155) {
+		if (time > 45 && time < 155) {
 
 			if (glassStand != null) {
 
-				if(time < 94)
-					glassLocation.add(0, 0.021, 0);
+				if (time < 94) glassLocation.add(0, 0.021, 0);
 
-				if(time > 85)
-					glassStand.setHeadPose(glassStand.getHeadPose().add(0, rotSpeed, 0));
+				if (time > 85) glassStand.setHeadPose(glassStand.getHeadPose().add(0, rotSpeed, 0));
 
 				glassStand.teleport(glassLocation);
 
@@ -95,16 +96,16 @@ public class Animation12_Task extends Animation {
 
 			if (liquidStand != null) {
 
-				if(time < 94)
-					liquidLocation.add(0, 0.021, 0);
+				if (time < 94) liquidLocation.add(0, 0.021, 0);
 
-				if(time > 85)
-					liquidStand.setHeadPose(liquidStand.getHeadPose().add(0, rotSpeed, 0));
+				if (time > 85) liquidStand.setHeadPose(liquidStand.getHeadPose().add(0, rotSpeed, 0));
 
 				liquidStand.teleport(liquidLocation);
 
-				if(time % 2 == 0) {
-					if(time < 94)Sounds.playSound(liquidStand.getLocation(), Sounds.MySound.ORB_PICKUP, 0.5F, (float) ThreadLocalRandom.current().nextDouble(1, 3));
+				if (time % 2 == 0) {
+					if (time < 94)
+						Sounds.playSound(liquidStand.getLocation(), Sounds.MySound.ORB_PICKUP, 0.5F, (float) ThreadLocalRandom.current()
+								.nextDouble(1, 3));
 					liquidStand.setHelmet(wools.get(actualWool));
 					actualWool++;
 					if (actualWool >= wools.size()) actualWool = 0;
@@ -116,23 +117,25 @@ public class Animation12_Task extends Animation {
 
 		}
 
-		if(time == 100)
-			chargeParticles();
+		if (time == 100) chargeParticles();
 
-		if(time == 153) {
+		if (time == 153) {
 
 			doPreRewardReveal();
 
 		}
 
-		if(time == 175)
-			Sounds.playSound(getCubeletBox().getLocation(), Sounds.MySound.LEVEL_UP, 0.5F, 1F);
+		if (time == 175) Sounds.playSound(getCubeletBox().getLocation(), Sounds.MySound.LEVEL_UP, 0.5F, 1F);
 
-		if(time > 45 && time < 145) {
-			UtilParticles.drawParticleLine(getCorner1().clone().add(0, -0.5,0), getCorner2().clone().add(0, -0.5,0), Particles.SPELL_WITCH, 5, 0, 0, 0);
-			UtilParticles.drawParticleLine(getCorner2().clone().add(0, -0.5,0), getCorner3().clone().add(0, -0.5,0), Particles.SPELL_WITCH, 5, 0, 0, 0);
-			UtilParticles.drawParticleLine(getCorner3().clone().add(0, -0.5,0), getCorner4().clone().add(0, -0.5,0), Particles.SPELL_WITCH, 5, 0, 0, 0);
-			UtilParticles.drawParticleLine(getCorner1().clone().add(0, -0.5,0), getCorner4().clone().add(0, -0.5,0), Particles.SPELL_WITCH, 5, 0, 0, 0);
+		if (time > 45 && time < 145) {
+			UtilParticles.drawParticleLine(getCorner1().clone().add(0, -0.5, 0), getCorner2().clone()
+					.add(0, -0.5, 0), Particles.SPELL_WITCH, 5, 0, 0, 0);
+			UtilParticles.drawParticleLine(getCorner2().clone().add(0, -0.5, 0), getCorner3().clone()
+					.add(0, -0.5, 0), Particles.SPELL_WITCH, 5, 0, 0, 0);
+			UtilParticles.drawParticleLine(getCorner3().clone().add(0, -0.5, 0), getCorner4().clone()
+					.add(0, -0.5, 0), Particles.SPELL_WITCH, 5, 0, 0, 0);
+			UtilParticles.drawParticleLine(getCorner1().clone().add(0, -0.5, 0), getCorner4().clone()
+					.add(0, -0.5, 0), Particles.SPELL_WITCH, 5, 0, 0, 0);
 		}
 
 	}
@@ -169,26 +172,27 @@ public class Animation12_Task extends Animation {
 
 		stopAnimationBlocks();
 
-		if(getMain().getAnimationHandler().getEntities().contains(glassStand)) {
-			if(glassStand != null) glassStand.remove();
+		if (getMain().getAnimationHandler().getEntities().contains(glassStand)) {
+			if (glassStand != null) glassStand.remove();
 			getMain().getAnimationHandler().getEntities().remove(glassStand);
 		}
 
-		if(getMain().getAnimationHandler().getEntities().contains(liquidStand)) {
-			if(liquidStand != null) liquidStand.remove();
+		if (getMain().getAnimationHandler().getEntities().contains(liquidStand)) {
+			if (liquidStand != null) liquidStand.remove();
 			getMain().getAnimationHandler().getEntities().remove(liquidStand);
 		}
 
 		try {
-			for(Animation12_Orbit orbit : orbits) {
+			for (Animation12_Orbit orbit : orbits) {
 				orbit.cancel();
-				if(getMain().getAnimationHandler().getEntities().contains(orbit.getArmorStand())) {
+				if (getMain().getAnimationHandler().getEntities().contains(orbit.getArmorStand())) {
 					ArmorStand armorStandOrbit = orbit.getArmorStand();
-					if(armorStandOrbit != null) armorStandOrbit.remove();
+					if (armorStandOrbit != null) armorStandOrbit.remove();
 					getMain().getAnimationHandler().getEntities().remove(armorStandOrbit);
 				}
 			}
-		} catch(IllegalStateException | NullPointerException ignored) {}
+		} catch (IllegalStateException | NullPointerException ignored) {
+		}
 
 	}
 
@@ -197,12 +201,10 @@ public class Animation12_Task extends Animation {
 
 		Sounds.playSound(liquidStand.getLocation(), Sounds.MySound.EXPLODE, 0.5F, 1F);
 
-		getMain().getFireworkUtil().spawn(
-				getCubeletBox().getLocation().clone().add(0.5, 1.50, 0.5),
-				FireworkEffect.Type.BALL_LARGE,
-				getColors().get(0),
-				getColors().get(1)
-		);
+		getMain().getFireworkUtil()
+				.spawn(getCubeletBox().getLocation()
+						.clone()
+						.add(0.5, 1.50, 0.5), FireworkEffect.Type.BALL_LARGE, getColors().get(0), getColors().get(1));
 
 	}
 
@@ -220,7 +222,8 @@ public class Animation12_Task extends Animation {
 	}
 
 	@Override
-	public void onRewardDuplication() {}
+	public void onRewardDuplication() {
+	}
 
 	private void chargeParticles() {
 		Random random = new Random();
@@ -232,10 +235,10 @@ public class Animation12_Task extends Animation {
 			Vector vector = randomLoc.toVector().subtract(loc.toVector()).normalize();
 			Vector direction = vector.multiply(1.5D + new Random().nextDouble() * 5.0D);
 
-			for(int j = 0; j < 3; j++)
+			for (int j = 0; j < 3; j++)
 				UtilParticles.display(Particles.PORTAL, direction, loc, 5);
 
 		}
 	}
-	
+
 }

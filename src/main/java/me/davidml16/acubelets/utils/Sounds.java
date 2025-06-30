@@ -20,7 +20,7 @@ public class Sounds {
 
 	/**
 	 * Version independent spigot sounds.
-	 *
+	 * <p>
 	 * Enum mapping to sound names for different
 	 * minecraft versions.
 	 */
@@ -218,9 +218,11 @@ public class Sounds {
 		VILLAGER_HIT("VILLAGER_HIT", "ENTITY_VILLAGER_HURT"),
 		VILLAGER_IDLE("VILLAGER_IDLE", "ENTITY_VILLAGER_AMBIENT"),
 		VILLAGER_NO("VILLAGER_NO", "ENTITY_VILLAGER_NO"),
-		VILLAGER_YES("VILLAGER_YES", "ENTITY_VILLAGER_YES");
+		VILLAGER_YES("VILLAGER_YES", "ENTITY_VILLAGER_YES"),
+		BEACON_ACTIVATE("BEACON_ACTIVATE", "BLOCK_BEACON_ACTIVATE"),
+		BEACON_AMBIENT("BEACON_AMBIENT", "BLOCK_BEACON_AMBIENT");
 
-		private String[] versionDependentNames;
+		private final String[] versionDependentNames;
 		private org.bukkit.Sound cached = null;
 
 		MySound(String... versionDependentNames) {
@@ -229,8 +231,9 @@ public class Sounds {
 
 		/**
 		 * Get the bukkit sound for current server version
-		 *
+		 * <p>
 		 * Caches sound on first call
+		 *
 		 * @return corresponding {@link org.bukkit.Sound}
 		 */
 		public org.bukkit.Sound bukkitSound() {

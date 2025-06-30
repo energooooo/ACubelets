@@ -7,9 +7,7 @@ import me.davidml16.acubelets.enums.Rotation;
 import me.davidml16.acubelets.objects.CubeletMachine;
 import me.davidml16.acubelets.utils.StringUtils;
 import me.davidml16.acubelets.utils.Utils;
-import org.bukkit.Bukkit;
-import org.bukkit.Location;
-import org.bukkit.Particle;
+import org.bukkit.*;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.event.block.Action;
 
@@ -21,232 +19,238 @@ import java.util.HashMap;
 
 public class CubeletMachineHandler {
 
-    private HashMap<Location, CubeletMachine> machines;
-    private File file;
-    private YamlConfiguration config;
+	private final HashMap<Location, CubeletMachine> machines;
+	private final Main main;
+	private File file;
+	private YamlConfiguration config;
+	private String cubeletMachineClickType;
 
-    private String cubeletMachineClickType;
+	public CubeletMachineHandler(Main main) {
+		this.main = main;
+		this.machines = new HashMap<Location, CubeletMachine>();
+	}
 
-    private Main main;
+	public HashMap<Location, CubeletMachine> getMachines() {
+		return machines;
+	}
 
-    public CubeletMachineHandler(Main main) {
-        this.main = main;
-        this.machines = new HashMap<Location, CubeletMachine>();
-    }
+	public File getFile() {
+		return file;
+	}
 
-    public HashMap<Location, CubeletMachine> getMachines() {
-        return machines;
-    }
+	public YamlConfiguration getConfig() {
+		return config;
+	}
 
-    public File getFile() {
-        return file;
-    }
+	public CubeletMachine getMachineByLocation(Location loc) {
+		return machines.get(loc);
+	}
 
-    public YamlConfiguration getConfig() {
-        return config;
-    }
+	public void createMachine(Location loc, double blockHeight) {
+		CubeletMachine machine = new CubeletMachine(loc, blockHeight, blockHeight, Rotation.SOUTH);
+		machines.put(loc, machine);
+		main.getHologramImplementation().loadHolograms(machine);
 
-    public CubeletMachine getMachineByLocation(Location loc) {
-        return machines.get(loc);
-    }
+		config.set("machines", new ArrayList<>());
 
-    public void createMachine(Location loc, double blockHeight) {
-        CubeletMachine machine = new CubeletMachine(loc, blockHeight, blockHeight, Rotation.SOUTH);
-        machines.put(loc, machine);
-        main.getHologramImplementation().loadHolograms(machine);
+		int i = 1;
+		for (CubeletMachine bx : machines.values()) {
+			config.set("machines." + i + ".location.world", bx.getLocation().getWorld().getName());
+			config.set("machines." + i + ".location.x", bx.getLocation().getBlockX());
+			config.set("machines." + i + ".location.y", bx.getLocation().getBlockY());
+			config.set("machines." + i + ".location.z", bx.getLocation().getBlockZ());
+			config.set("machines." + i + ".rotation", bx.getRotation().toString());
+			config.set("machines." + i + ".blockHeight", bx.getBlockHeight());
+			config.set("machines." + i + ".permanentBlockHeight", bx.getPermanentBlockHeight());
+			config.set("machines." + i + ".idleEffect.type", bx.getBlockEffectModel().name());
+			config.set("machines." + i + ".idleEffect.particle", bx.getBlockEffectParticle().getParticle().name());
+			i++;
+		}
 
-        config.set("machines", new ArrayList<>());
+		saveConfig();
+	}
 
-        int i = 1;
-        for(CubeletMachine bx : machines.values()) {
-            config.set("machines." + i + ".location.world", bx.getLocation().getWorld().getName());
-            config.set("machines." + i + ".location.x", bx.getLocation().getBlockX());
-            config.set("machines." + i + ".location.y", bx.getLocation().getBlockY());
-            config.set("machines." + i + ".location.z", bx.getLocation().getBlockZ());
-            config.set("machines." + i + ".rotation", bx.getRotation().toString());
-            config.set("machines." + i + ".blockHeight", bx.getBlockHeight());
-            config.set("machines." + i + ".permanentBlockHeight", bx.getPermanentBlockHeight());
-            config.set("machines." + i + ".idleEffect.type", bx.getBlockEffectModel().name());
-            config.set("machines." + i + ".idleEffect.particle", bx.getBlockEffectParticle().getParticle().name());
-            i++;
-        }
+	public void removeMachine(Location loc) {
 
-        saveConfig();
-    }
+		if (machines.containsKey(loc)) {
 
-    public void removeMachine(Location loc) {
+			CubeletMachine machine = getMachineByLocation(loc);
+			main.getHologramImplementation().removeHolograms(machine);
 
-        if(machines.containsKey(loc)) {
+			main.getHologramImplementation().clearHolograms(machine);
 
-            CubeletMachine machine = getMachineByLocation(loc);
-            main.getHologramImplementation().removeHolograms(machine);
+			machines.remove(loc);
 
-            main.getHologramImplementation().clearHolograms(machine);
+			config.set("machines", new ArrayList<>());
 
-            machines.remove(loc);
+			int i = 1;
+			for (CubeletMachine bx : machines.values()) {
+				config.set("machines." + i + ".location.world", bx.getLocation().getWorld().getName());
+				config.set("machines." + i + ".location.x", bx.getLocation().getBlockX());
+				config.set("machines." + i + ".location.y", bx.getLocation().getBlockY());
+				config.set("machines." + i + ".location.z", bx.getLocation().getBlockZ());
+				config.set("machines." + i + ".rotation", bx.getRotation().toString());
+				config.set("machines." + i + ".blockHeight", bx.getBlockHeight());
+				config.set("machines." + i + ".permanentBlockHeight", bx.getPermanentBlockHeight());
+				config.set("machines." + i + ".idleEffect.type", bx.getBlockEffectModel().name());
+				config.set("machines." + i + ".idleEffect.particle", bx.getBlockEffectParticle().getParticle().name());
+				i++;
+			}
 
-            config.set("machines", new ArrayList<>());
+			saveConfig();
+		}
 
-            int i = 1;
-            for(CubeletMachine bx : machines.values()) {
-                config.set("machines." + i + ".location.world", bx.getLocation().getWorld().getName());
-                config.set("machines." + i + ".location.x", bx.getLocation().getBlockX());
-                config.set("machines." + i + ".location.y", bx.getLocation().getBlockY());
-                config.set("machines." + i + ".location.z", bx.getLocation().getBlockZ());
-                config.set("machines." + i + ".rotation", bx.getRotation().toString());
-                config.set("machines." + i + ".blockHeight", bx.getBlockHeight());
-                config.set("machines." + i + ".permanentBlockHeight", bx.getPermanentBlockHeight());
-                config.set("machines." + i + ".idleEffect.type", bx.getBlockEffectModel().name());
-                config.set("machines." + i + ".idleEffect.particle", bx.getBlockEffectParticle().getParticle().name());
-                i++;
-            }
+	}
 
-            saveConfig();
-        }
+	public void saveMachines() {
+		config.set("machines", new ArrayList<>());
 
-    }
+		int i = 1;
+		for (CubeletMachine bx : machines.values()) {
+			config.set("machines." + i + ".location.world", bx.getLocation().getWorld().getName());
+			config.set("machines." + i + ".location.x", bx.getLocation().getBlockX());
+			config.set("machines." + i + ".location.y", bx.getLocation().getBlockY());
+			config.set("machines." + i + ".location.z", bx.getLocation().getBlockZ());
+			config.set("machines." + i + ".rotation", bx.getRotation().toString());
+			config.set("machines." + i + ".blockHeight", bx.getBlockHeight());
+			config.set("machines." + i + ".permanentBlockHeight", bx.getPermanentBlockHeight());
+			config.set("machines." + i + ".idleEffect.type", bx.getBlockEffectModel().name());
+			config.set("machines." + i + ".idleEffect.particle", bx.getBlockEffectParticle().getParticle().name());
+			i++;
+		}
 
-    public void saveMachines() {
-        config.set("machines", new ArrayList<>());
+		saveConfig();
+	}
 
-        int i = 1;
-        for(CubeletMachine bx : machines.values()) {
-            config.set("machines." + i + ".location.world", bx.getLocation().getWorld().getName());
-            config.set("machines." + i + ".location.x", bx.getLocation().getBlockX());
-            config.set("machines." + i + ".location.y", bx.getLocation().getBlockY());
-            config.set("machines." + i + ".location.z", bx.getLocation().getBlockZ());
-            config.set("machines." + i + ".rotation", bx.getRotation().toString());
-            config.set("machines." + i + ".blockHeight", bx.getBlockHeight());
-            config.set("machines." + i + ".permanentBlockHeight", bx.getPermanentBlockHeight());
-            config.set("machines." + i + ".idleEffect.type", bx.getBlockEffectModel().name());
-            config.set("machines." + i + ".idleEffect.particle", bx.getBlockEffectParticle().getParticle().name());
-            i++;
-        }
+	public void saveConfig() {
+		try {
+			config.save(file);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
 
-        saveConfig();
-    }
+	public void loadMachines() {
 
-    public void saveConfig() {
-        try {
-            config.save(file);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
+		machines.clear();
 
-    public void loadMachines() {
+		File file = new File(main.getDataFolder(), "machines.yml");
+		YamlConfiguration config = YamlConfiguration.loadConfiguration(file);
+		if (!file.exists()) {
+			try {
+				file.createNewFile();
+				config.set("machines", new ArrayList<>());
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
 
-        machines.clear();
+		this.file = file;
+		this.config = config;
 
-        File file = new File(main.getDataFolder(), "machines.yml");
-        YamlConfiguration config = YamlConfiguration.loadConfiguration(file);
-        if(!file.exists()) {
-            try {
-                file.createNewFile();
-                config.set("machines", new ArrayList<>());
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
+		if (!config.contains("machines")) {
+			config.set("machines", new ArrayList<>());
+		}
 
-        this.file = file;
-        this.config = config;
+		saveConfig();
 
-        if(!config.contains("machines")) {
-            config.set("machines", new ArrayList<>());
-        }
+		Main.log.sendMessage(Utils.translate(""));
+		Main.log.sendMessage(Utils.translate("  &eLoading machines:"));
 
-        saveConfig();
+		if (config.contains("machines")) {
+			if (config.getConfigurationSection("machines") != null) {
+				for (int i = 1; i <= config.getConfigurationSection("machines").getKeys(false).size(); i++) {
+					String world = config.getString("machines." + i + ".location.world");
+					int x = config.getInt("machines." + i + ".location.x");
+					int y = config.getInt("machines." + i + ".location.y");
+					int z = config.getInt("machines." + i + ".location.z");
 
-        Main.log.sendMessage(Utils.translate(""));
-        Main.log.sendMessage(Utils.translate("  &eLoading machines:"));
+					World worldObj = Bukkit.getServer().getWorld(world);
 
-        if(config.contains("machines")) {
-            if(config.getConfigurationSection("machines") != null) {
-                for (int i = 1; i <= config.getConfigurationSection("machines").getKeys(false).size(); i++) {
-                    String world = config.getString("machines." + i + ".location.world");
-                    int x = config.getInt("machines." + i + ".location.x");
-                    int y = config.getInt("machines." + i + ".location.y");
-                    int z = config.getInt("machines." + i + ".location.z");
+					if (worldObj == null) {
+						Main.log.sendMessage(Utils.translate("    &cWorld '" + world + "' not loaded! Attempting to load it."));
+						WorldCreator worldCreator = new WorldCreator(world);
+						worldObj = Bukkit.createWorld(worldCreator);
 
-                    if(Bukkit.getServer().getWorld(world) == null) continue;
+						if (worldObj == null) {
+							Main.log.sendMessage(Utils.translate("    &cWorld '" + world + "' does not exist! Skipping machine loading."));
+							continue;
+						}
+					}
 
-                    Location loc = new Location(Bukkit.getWorld(world), x, y, z);
+					Location loc = new Location(Bukkit.getWorld(world), x, y, z);
 
-                    Rotation rotation = Rotation.SOUTH;
-                    if(config.contains("machines." + i + ".rotation"))
-                        rotation = Rotation.valueOf(config.getString("machines." + i + ".rotation"));
+					Rotation rotation = Rotation.SOUTH;
+					if (config.contains("machines." + i + ".rotation"))
+						rotation = Rotation.valueOf(config.getString("machines." + i + ".rotation"));
 
-                    double blockHeight = 0.875;
-                    if(config.contains("machines." + i + ".blockHeight"))
-                        blockHeight = config.getDouble("machines." + i + ".blockHeight");
+					double blockHeight = 0.875;
+					if (config.contains("machines." + i + ".blockHeight"))
+						blockHeight = config.getDouble("machines." + i + ".blockHeight");
 
-                    double permanentBlockHeight = blockHeight;
-                    if(config.contains("machines." + i + ".permanentBlockHeight"))
-                        permanentBlockHeight = config.getDouble("machines." + i + ".permanentBlockHeight");
+					double permanentBlockHeight = blockHeight;
+					if (config.contains("machines." + i + ".permanentBlockHeight"))
+						permanentBlockHeight = config.getDouble("machines." + i + ".permanentBlockHeight");
 
-                    if(config.contains("machines." + i + ".permanentBlockHeight"))
-                        permanentBlockHeight = config.getDouble("machines." + i + ".permanentBlockHeight");
+					if (config.contains("machines." + i + ".permanentBlockHeight"))
+						permanentBlockHeight = config.getDouble("machines." + i + ".permanentBlockHeight");
 
-                    CubeletMachine cubeletMachine = new CubeletMachine(loc, blockHeight, permanentBlockHeight, rotation);
+					CubeletMachine cubeletMachine = new CubeletMachine(loc, blockHeight, permanentBlockHeight, rotation);
 
-                    if(config.contains("machines." + i + ".idleEffect.type")) {
-                        MachineEffectModel effectModel = StringUtils.getEnum(config.getString("machines." + i + ".idleEffect.type"), MachineEffectModel.class).orElse(MachineEffectModel.NONE);
-                        cubeletMachine.setBlockEffectModel(effectModel);
-                    }
+					if (config.contains("machines." + i + ".idleEffect.type")) {
+						MachineEffectModel effectModel = StringUtils.getEnum(config.getString("machines." + i + ".idleEffect.type"), MachineEffectModel.class)
+								.orElse(MachineEffectModel.NONE);
+						cubeletMachine.setBlockEffectModel(effectModel);
+					}
 
-                    if(config.contains("machines." + i + ".idleEffect.particle")) {
-                        String sParticle = config.getString("machines." + i + ".idleEffect.particle").equalsIgnoreCase("NONE") ? "FLAME" : config.getString("machines." + i + ".idleEffect.particle");
-                        Particle particle = Particle.valueOf(sParticle);
-                        SimpleParticle simpleParticle = SimpleParticle.of(particle).parseData("");
+					if (config.contains("machines." + i + ".idleEffect.particle")) {
+						String sParticle = config.getString("machines." + i + ".idleEffect.particle")
+								.equalsIgnoreCase("NONE") ? "FLAME" : config.getString("machines." + i + ".idleEffect.particle");
+						Particle particle = Particle.valueOf(sParticle);
+						SimpleParticle simpleParticle = SimpleParticle.of(particle).parseData("");
 
-                        cubeletMachine.setBlockEffectParticle(simpleParticle);
-                    }
+						cubeletMachine.setBlockEffectParticle(simpleParticle);
+					}
 
-                    machines.put(loc, cubeletMachine);
-                }
-            }
+					machines.put(loc, cubeletMachine);
+				}
+			}
 
-            config.set("machines", new ArrayList<>());
-            int i = 1;
-            for(CubeletMachine bx : machines.values()) {
-                if(bx.getLocation().getWorld() == null) continue;
-                config.set("machines." + i + ".location.world", bx.getLocation().getWorld().getName());
-                config.set("machines." + i + ".location.x", bx.getLocation().getBlockX());
-                config.set("machines." + i + ".location.y", bx.getLocation().getBlockY());
-                config.set("machines." + i + ".location.z", bx.getLocation().getBlockZ());
-                config.set("machines." + i + ".rotation", bx.getRotation().toString());
-                config.set("machines." + i + ".blockHeight", bx.getBlockHeight());
-                config.set("machines." + i + ".permanentBlockHeight", bx.getPermanentBlockHeight());
-                config.set("machines." + i + ".idleEffect.type", bx.getBlockEffectModel().name());
-                config.set("machines." + i + ".idleEffect.particle", bx.getBlockEffectParticle().getParticle().name());
-                i++;
-            }
-            saveConfig();
-        }
+			config.set("machines", new ArrayList<>());
+			int i = 1;
+			for (CubeletMachine bx : machines.values()) {
+				if (bx.getLocation().getWorld() == null) continue;
+				config.set("machines." + i + ".location.world", bx.getLocation().getWorld().getName());
+				config.set("machines." + i + ".location.x", bx.getLocation().getBlockX());
+				config.set("machines." + i + ".location.y", bx.getLocation().getBlockY());
+				config.set("machines." + i + ".location.z", bx.getLocation().getBlockZ());
+				config.set("machines." + i + ".rotation", bx.getRotation().toString());
+				config.set("machines." + i + ".blockHeight", bx.getBlockHeight());
+				config.set("machines." + i + ".permanentBlockHeight", bx.getPermanentBlockHeight());
+				config.set("machines." + i + ".idleEffect.type", bx.getBlockEffectModel().name());
+				config.set("machines." + i + ".idleEffect.particle", bx.getBlockEffectParticle().getParticle().name());
+				i++;
+			}
+			saveConfig();
+		}
 
-        if(machines.size() == 0)
-            Main.log.sendMessage(Utils.translate("    &cNo Cubelet Machines has been loaded!"));
-        else
-            Main.log.sendMessage(Utils.translate("    &b" + machines.size() + " &aCubelet Machines loaded!"));
+		if (machines.size() == 0) Main.log.sendMessage(Utils.translate("    &cNo Cubelet Machines has been loaded!"));
+		else Main.log.sendMessage(Utils.translate("    &b" + machines.size() + " &aCubelet Machines loaded!"));
 
-    }
+	}
 
-    public void setClickType(String clickType) {
-        if(Arrays.asList("LEFT", "RIGHT", "BOTH").contains(clickType))
-            this.cubeletMachineClickType = clickType.toUpperCase();
-        else
-            this.cubeletMachineClickType = "BOTH";
-    }
+	public void setClickType(String clickType) {
+		if (Arrays.asList("LEFT", "RIGHT", "BOTH").contains(clickType))
+			this.cubeletMachineClickType = clickType.toUpperCase();
+		else this.cubeletMachineClickType = "BOTH";
+	}
 
-    public boolean isClickType(Action action) {
-        if(cubeletMachineClickType.equalsIgnoreCase("BOTH"))
-            return (action == Action.LEFT_CLICK_BLOCK || action == Action.RIGHT_CLICK_BLOCK);
-        else if(cubeletMachineClickType.equalsIgnoreCase("LEFT"))
-            return (action == Action.LEFT_CLICK_BLOCK);
-        else if(cubeletMachineClickType.equalsIgnoreCase("RIGHT"))
-            return (action == Action.RIGHT_CLICK_BLOCK);
-        return false;
-    }
+	public boolean isClickType(Action action) {
+		if (cubeletMachineClickType.equalsIgnoreCase("BOTH"))
+			return (action == Action.LEFT_CLICK_BLOCK || action == Action.RIGHT_CLICK_BLOCK);
+		else if (cubeletMachineClickType.equalsIgnoreCase("LEFT")) return (action == Action.LEFT_CLICK_BLOCK);
+		else if (cubeletMachineClickType.equalsIgnoreCase("RIGHT")) return (action == Action.RIGHT_CLICK_BLOCK);
+		return false;
+	}
 
 }

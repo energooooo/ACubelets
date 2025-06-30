@@ -4,7 +4,7 @@ import me.davidml16.acubelets.Main;
 import me.davidml16.acubelets.animations.ASSpawner;
 import me.davidml16.acubelets.animations.Animation;
 import me.davidml16.acubelets.animations.AnimationSettings;
-import me.davidml16.acubelets.utils.SkullCreator;
+import me.davidml16.acubelets.utils.SkullUtils;
 import me.davidml16.acubelets.utils.Sounds;
 import org.bukkit.Color;
 import org.bukkit.FireworkEffect;
@@ -18,89 +18,84 @@ import java.util.Set;
 
 public class Animation14_Task extends Animation {
 
+	private static final ItemStack BEE = SkullUtils.itemFromBase64("eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvOTlkYzNmMDBlY2FiMjI0OWJiNmExNmM4YzUxMTVjZWI5ZjIzMjA1YTBkNTVjYzBlOWJhYmQyNTYyZjc5NTljNCJ9fX0=");
+	private final Set<Animation14_Bee> bees = new HashSet<>();
+	private ArmorStand armorStand;
+	private Location armorStandLocation;
+	private double rotSpeed = 0.001;
+
 	public Animation14_Task(Main main, AnimationSettings animationSettings) {
 		super(main, animationSettings);
 	}
 
-	private ArmorStand armorStand;
-	private Location armorStandLocation;
-
-	private Set<Animation14_Bee> bees = new HashSet<>();
-
-	private double rotSpeed = 0.001;
-
-	private static final ItemStack BEE = SkullCreator.itemFromBase64("eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvOTlkYzNmMDBlY2FiMjI0OWJiNmExNmM4YzUxMTVjZWI5ZjIzMjA1YTBkNTVjYzBlOWJhYmQyNTYyZjc5NTljNCJ9fX0=");
-
 	@Override
 	public void onTick(int time) {
 
-		if(time == 45) {
+		if (time == 45) {
 
-			armorStand = ASSpawner.spawn(
-					getMain(),
-					getCubeletBox().getLocation().clone().add(0.5, -0.3, 0.5),
-					SkullCreator.itemFromBase64("eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYmI5OTYwZWFkZTJkY2I2ZTc0NGM3ZDA4NGRlZjAwNTk5ZmU3MzI3ZTM5NzNjZDJjYTBhZjRhMmExZTZlYWMwOCJ9fX0="),
-					false,
-					false,
-					true
-			);
+			armorStand = ASSpawner.spawn(getMain(), getCubeletBox().getLocation()
+					.clone()
+					.add(0.5, -0.3, 0.5), SkullUtils.itemFromBase64("eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYmI5OTYwZWFkZTJkY2I2ZTc0NGM3ZDA4NGRlZjAwNTk5ZmU3MzI3ZTM5NzNjZDJjYTBhZjRhMmExZTZlYWMwOCJ9fX0="), false, false, true);
 
 			armorStandLocation = armorStand.getLocation();
 			getMain().getAnimationHandler().getEntities().add(armorStand);
 
 		}
 
-		if(time == 6) {
+		if (time == 6) {
 
-			Animation14_Bee bee = new Animation14_Bee(getMain(), BEE, getCubeletBox().getLocation().clone().add(0.5, 3, 0.5),
-					3f, 120, true, 0);
-
-			bee.runTaskTimer(getMain(), 0L, 1L);
-			bees.add(bee);
-
-		} else if(time == 12) {
-
-			Animation14_Bee bee = new Animation14_Bee(getMain(), BEE, getCubeletBox().getLocation().clone().add(0.5, 3, 0.5),
-					3f, 120, true, 30);
+			Animation14_Bee bee = new Animation14_Bee(getMain(), BEE, getCubeletBox().getLocation()
+					.clone()
+					.add(0.5, 3, 0.5), 3f, 120, true, 0);
 
 			bee.runTaskTimer(getMain(), 0L, 1L);
 			bees.add(bee);
 
-		} else if(time == 18) {
+		} else if (time == 12) {
 
-			Animation14_Bee bee = new Animation14_Bee(getMain(), BEE, getCubeletBox().getLocation().clone().add(0.5, 3, 0.5),
-					3f, 120, true, 60);
-
-			bee.runTaskTimer(getMain(), 0L, 1L);
-			bees.add(bee);
-
-		} else if(time == 24) {
-
-			Animation14_Bee bee = new Animation14_Bee(getMain(), BEE, getCubeletBox().getLocation().clone().add(0.5, 3, 0.5),
-					3f, 120, true, 90);
+			Animation14_Bee bee = new Animation14_Bee(getMain(), BEE, getCubeletBox().getLocation()
+					.clone()
+					.add(0.5, 3, 0.5), 3f, 120, true, 30);
 
 			bee.runTaskTimer(getMain(), 0L, 1L);
 			bees.add(bee);
 
-		} else if(time == 30) {
+		} else if (time == 18) {
 
-			Animation14_Bee bee = new Animation14_Bee(getMain(), BEE, getCubeletBox().getLocation().clone().add(0.5, 3, 0.5),
-					3f, 120, true, 119);
+			Animation14_Bee bee = new Animation14_Bee(getMain(), BEE, getCubeletBox().getLocation()
+					.clone()
+					.add(0.5, 3, 0.5), 3f, 120, true, 60);
+
+			bee.runTaskTimer(getMain(), 0L, 1L);
+			bees.add(bee);
+
+		} else if (time == 24) {
+
+			Animation14_Bee bee = new Animation14_Bee(getMain(), BEE, getCubeletBox().getLocation()
+					.clone()
+					.add(0.5, 3, 0.5), 3f, 120, true, 90);
+
+			bee.runTaskTimer(getMain(), 0L, 1L);
+			bees.add(bee);
+
+		} else if (time == 30) {
+
+			Animation14_Bee bee = new Animation14_Bee(getMain(), BEE, getCubeletBox().getLocation()
+					.clone()
+					.add(0.5, 3, 0.5), 3f, 120, true, 119);
 
 			bee.runTaskTimer(getMain(), 0L, 1L);
 			bees.add(bee);
 
 		}
 
-		if(time > 45 && time < 165) {
+		if (time > 45 && time < 165) {
 
 			if (armorStand != null) {
 
-				if(time < 94)
-					armorStandLocation.add(0, 0.021, 0);
+				if (time < 94) armorStandLocation.add(0, 0.021, 0);
 
-				if(time > 85)
-					armorStand.setHeadPose(armorStand.getHeadPose().add(0, rotSpeed, 0));
+				if (time > 85) armorStand.setHeadPose(armorStand.getHeadPose().add(0, rotSpeed, 0));
 
 				armorStand.teleport(armorStandLocation);
 
@@ -110,14 +105,13 @@ public class Animation14_Task extends Animation {
 
 		}
 
-		if(time == 123) {
+		if (time == 123) {
 
 			doPreRewardReveal();
 
 		}
 
-		if(time == 145)
-			Sounds.playSound(getCubeletBox().getLocation(), Sounds.MySound.LEVEL_UP, 0.5F, 1F);
+		if (time == 145) Sounds.playSound(getCubeletBox().getLocation(), Sounds.MySound.LEVEL_UP, 0.5F, 1F);
 
 	}
 
@@ -142,18 +136,19 @@ public class Animation14_Task extends Animation {
 		stopAnimationBlocks();
 
 		try {
-			for(Animation14_Bee bee : bees) {
+			for (Animation14_Bee bee : bees) {
 				bee.cancel();
-				if(getMain().getAnimationHandler().getEntities().contains(bee.getArmorStand())) {
+				if (getMain().getAnimationHandler().getEntities().contains(bee.getArmorStand())) {
 					ArmorStand beeArmorStand = bee.getArmorStand();
-					if(beeArmorStand != null) beeArmorStand.remove();
+					if (beeArmorStand != null) beeArmorStand.remove();
 					getMain().getAnimationHandler().getEntities().remove(beeArmorStand);
 				}
 			}
-		} catch(IllegalStateException | NullPointerException ignored) {}
+		} catch (IllegalStateException | NullPointerException ignored) {
+		}
 
-		if(getMain().getAnimationHandler().getEntities().contains(armorStand)) {
-			if(armorStand != null) armorStand.remove();
+		if (getMain().getAnimationHandler().getEntities().contains(armorStand)) {
+			if (armorStand != null) armorStand.remove();
 			getMain().getAnimationHandler().getEntities().remove(armorStand);
 		}
 
@@ -166,12 +161,10 @@ public class Animation14_Task extends Animation {
 
 		Sounds.playSound(armorStand.getLocation(), Sounds.MySound.EXPLODE, 0.5F, 1F);
 
-		getMain().getFireworkUtil().spawn(
-				getCubeletBox().getLocation().clone().add(0.5, 1.50, 0.5),
-				FireworkEffect.Type.BALL_LARGE,
-				getColors().get(0),
-				getColors().get(1)
-		);
+		getMain().getFireworkUtil()
+				.spawn(getCubeletBox().getLocation()
+						.clone()
+						.add(0.5, 1.50, 0.5), FireworkEffect.Type.BALL_LARGE, getColors().get(0), getColors().get(1));
 
 	}
 
@@ -184,6 +177,7 @@ public class Animation14_Task extends Animation {
 	}
 
 	@Override
-	public void onRewardDuplication() {}
+	public void onRewardDuplication() {
+	}
 
 }

@@ -1,7 +1,7 @@
 name: ACubelets
 version: ${project.version}
 main: me.davidml16.acubelets.Main
-depend: [ProtocolLib]
-softdepend: [PlaceholderAPI, Vault, Multiverse-Core, Hyperverse, HolographicDisplays, DecentHolograms]
-authors: [DavidML16]
+depend: [ ProtocolLib ]
+softdepend: [ PlaceholderAPI, Vault, Multiverse-Core, Hyperverse, HolographicDisplays, DecentHolograms ]
+authors: [ DavidML16, Fedox ]
 api-version: 1.13
