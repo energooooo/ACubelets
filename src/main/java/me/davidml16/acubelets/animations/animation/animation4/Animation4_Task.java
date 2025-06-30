@@ -1,7 +1,6 @@
 package me.davidml16.acubelets.animations.animation.animation4;
 
 import com.cryptomorin.xseries.XMaterial;
-import io.github.bananapuncher714.nbteditor.NBTEditor;
 import me.davidml16.acubelets.Main;
 import me.davidml16.acubelets.animations.ASSpawner;
 import me.davidml16.acubelets.animations.Animation;
@@ -20,29 +19,28 @@ import java.util.Arrays;
 
 public class Animation4_Task extends Animation {
 
+	private ArmorStand armorStand;
+	private Location armorStandLocation;
+	private LivingEntity pigman;
+	private Location pigmanLocation;
+
 	public Animation4_Task(Main main, AnimationSettings animationSettings) {
 		super(main, animationSettings);
 	}
 
-	private ArmorStand armorStand;
-	private Location armorStandLocation;
-
-	private LivingEntity pigman;
-	private Location pigmanLocation;
-
 	@Override
 	public void onTick(int time) {
 
-		if(time == 45) {
+		if (time == 45) {
 
 			startRunnable("arch", 0L, 1L);
 			startRunnable("archSounds", 0L, 5L);
 
-		} else if(time == 95) {
+		} else if (time == 95) {
 
 			cancelRunnable("archSounds");
 
-		} else if(time == 100) {
+		} else if (time == 100) {
 
 			startRunnable("music", 0L, 5L);
 
@@ -50,52 +48,54 @@ public class Animation4_Task extends Animation {
 			armorStandLocation = armorStand.getLocation();
 			getMain().getAnimationHandler().getEntities().add(armorStand);
 
-		} else if(time > 100 && time < 140) {
+		} else if (time > 100 && time < 140) {
 
 			if (armorStand != null) {
 
-				if(time < 139)armorStandLocation.add(0, 0.025, 0);
+				if (time < 139) armorStandLocation.add(0, 0.025, 0);
 				armorStand.teleport(armorStandLocation);
 				armorStand.setHeadPose(armorStand.getHeadPose().add(0, 0.16, 0));
 
 			}
 
-		} else if(time == 145) {
+		} else if (time == 145) {
 
 			cancelRunnable("music");
 
-			if(XMaterial.supports(16))
-				pigman = (LivingEntity) getCubeletBox().getLocation().getWorld().spawnEntity(getLocationRotation(3), EntityType.valueOf("ZOMBIFIED_PIGLIN"));
-			else
-				pigman = (LivingEntity) getCubeletBox().getLocation().getWorld().spawnEntity(getLocationRotation(3), EntityType.valueOf("PIG_ZOMBIE"));
+			if (XMaterial.supports(16)) pigman = (LivingEntity) getCubeletBox().getLocation()
+					.getWorld()
+					.spawnEntity(getLocationRotation(3), EntityType.valueOf("ZOMBIFIED_PIGLIN"));
+			else pigman = (LivingEntity) getCubeletBox().getLocation()
+					.getWorld()
+					.spawnEntity(getLocationRotation(3), EntityType.valueOf("PIG_ZOMBIE"));
 
 			pigman.setCollidable(false);
-			((PigZombie )pigman).setBaby(false);
-			((PigZombie )pigman).setAngry(false);
+			((PigZombie) pigman).setBaby(false);
+			((PigZombie) pigman).setAngry(false);
 			pigman.setRemoveWhenFarAway(false);
 			pigman.setMetadata("ACUBELETS", new FixedMetadataValue(getMain(), Boolean.TRUE));
 
-			NBTEditor.set( pigman, ( byte ) 1, "Silent" );
-			NBTEditor.set( pigman, ( byte ) 1, "Invulnerable" );
+			pigman.setSilent(true);
+			pigman.setInvulnerable(true);
 
 			addRunnable("particles", new Animation4_3x3Particles(pigman));
 			startRunnable("particles", 0L, 1L);
 
-		} else if(time == 155) {
+		} else if (time == 155) {
 
-			NBTEditor.set( pigman, ( byte ) 1, "NoAI" );
+			pigman.setAI(false);
 
 			pigmanLocation = pigman.getLocation();
 			pigmanLocation.setYaw(getCubeletBox().getRotation().value);
 			pigmanLocation.setPitch(0);
 			pigman.teleport(pigmanLocation);
 
-		} else if(time == 195) {
+		} else if (time == 195) {
 
 			addRunnable("entityPackets", new Animation4_EntityPackets(pigman, armorStand, getCubeletBox()));
 			startRunnable("entityPackets", 0L, 5L);
 
-		} else if(time == 293) {
+		} else if (time == 293) {
 
 			doPreRewardReveal();
 
@@ -126,10 +126,10 @@ public class Animation4_Task extends Animation {
 
 		cancelRunnables();
 
-		if(pigman != null) pigman.remove();
+		if (pigman != null) pigman.remove();
 
-		if(getMain().getAnimationHandler().getEntities().contains(armorStand)) {
-			if(armorStand != null) armorStand.remove();
+		if (getMain().getAnimationHandler().getEntities().contains(armorStand)) {
+			if (armorStand != null) armorStand.remove();
 			getMain().getAnimationHandler().getEntities().remove(armorStand);
 		}
 
@@ -138,12 +138,10 @@ public class Animation4_Task extends Animation {
 	@Override
 	public void onPreRewardReveal() {
 
-		getMain().getFireworkUtil().spawn(
-				getCubeletBox().getLocation().clone().add(0.5, 1.50, 0.5),
-				FireworkEffect.Type.BALL_LARGE,
-				getColors().get(0),
-				getColors().get(1)
-		);
+		getMain().getFireworkUtil()
+				.spawn(getCubeletBox().getLocation()
+						.clone()
+						.add(0.5, 1.50, 0.5), FireworkEffect.Type.BALL_LARGE, getColors().get(0), getColors().get(1));
 
 	}
 
@@ -164,6 +162,7 @@ public class Animation4_Task extends Animation {
 	}
 
 	@Override
-	public void onRewardDuplication() {}
+	public void onRewardDuplication() {
+	}
 
 }
