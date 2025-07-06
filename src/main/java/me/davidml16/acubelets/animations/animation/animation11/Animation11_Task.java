@@ -177,6 +177,7 @@ public class Animation11_Task extends Animation {
 			UtilParticles.display(Particles.EXPLOSION_LARGE, armorStand.getLocation().clone().add(0, 1.25, 0), 2);
 
 			armorStand.setGravity(true);
+
 			ASSpawner.setEntityNoclip(armorStand);
 
 		} else if (time > 160 && time < 173) {

@@ -1,7 +1,6 @@
 package me.davidml16.acubelets.animations.animation.animation7;
 
 import com.cryptomorin.xseries.XMaterial;
-import io.github.bananapuncher714.nbteditor.NBTEditor;
 import me.davidml16.acubelets.Main;
 import me.davidml16.acubelets.animations.ASSpawner;
 import me.davidml16.acubelets.animations.Animation;
@@ -242,8 +241,8 @@ public class Animation7_Task extends Animation {
 		bat.setPassenger(ghost);
 		bat.addPotionEffect(new PotionEffect(PotionEffectType.INVISIBILITY, 160, 1));
 
-		NBTEditor.set(bat, (byte) 1, "Silent");
-		NBTEditor.set(bat, (byte) 1, "Invulnerable");
+		bat.setSilent(true);
+		bat.setInvulnerable(true);
 
 		Sounds.playSound(bat.getLocation(), Sounds.MySound.BAT_TAKEOFF, 1F, 1F);
 

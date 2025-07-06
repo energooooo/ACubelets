@@ -1,7 +1,6 @@
 package me.davidml16.acubelets.animations.animation.animation8;
 
 import com.cryptomorin.xseries.XMaterial;
-import io.github.bananapuncher714.nbteditor.NBTEditor;
 import me.davidml16.acubelets.Main;
 import me.davidml16.acubelets.utils.SkullUtils;
 import org.bukkit.Location;
@@ -92,7 +91,6 @@ public class Animation8_Tree extends BukkitRunnable {
 	private void spawn(Location spawnLoc, ItemStack itemStack) {
 		ArmorStand armorStand = location.getWorld().spawn(spawnLoc, ArmorStand.class);
 
-		NBTEditor.set(armorStand, (byte) 1, "Silent");
 		armorStand.setSilent(true);
 
 		armorStand.setVisible(false);

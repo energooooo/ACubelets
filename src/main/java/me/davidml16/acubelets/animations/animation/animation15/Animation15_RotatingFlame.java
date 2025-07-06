@@ -1,6 +1,5 @@
 package me.davidml16.acubelets.animations.animation.animation15;
 
-import io.github.bananapuncher714.nbteditor.NBTEditor;
 import me.davidml16.acubelets.Main;
 import me.davidml16.acubelets.utils.LocationUtils;
 import me.davidml16.acubelets.utils.ParticlesAPI.Particles;
@@ -26,7 +25,6 @@ public class Animation15_RotatingFlame extends BukkitRunnable {
 		this.step = step;
 
 		ArmorStand armorStand = center.getWorld().spawn(locations.get(step), ArmorStand.class);
-		NBTEditor.set(armorStand, (byte) 1, "Silent");
 		armorStand.setSilent(true);
 		armorStand.setVisible(false);
 		armorStand.setGravity(false);

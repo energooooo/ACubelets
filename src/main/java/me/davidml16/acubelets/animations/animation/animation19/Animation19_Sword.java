@@ -1,7 +1,6 @@
 package me.davidml16.acubelets.animations.animation.animation19;
 
 import com.cryptomorin.xseries.XMaterial;
-import io.github.bananapuncher714.nbteditor.NBTEditor;
 import me.davidml16.acubelets.Main;
 import me.davidml16.acubelets.utils.LocationUtils;
 import me.davidml16.acubelets.utils.ParticlesAPI.Particles;
@@ -17,63 +16,68 @@ import java.util.List;
 
 public class Animation19_Sword extends BukkitRunnable {
 
-    private final ArmorStand armorStand;
+	private final ArmorStand armorStand;
 
-    private final List<Location> locations;
+	private final List<Location> locations;
 
-    private int step;
+	private int step;
 
-    private double yDif;
+	private final double yDif;
 
-    public Animation19_Sword(Main main, Location center, float radius, int points, boolean small, int step) {
-        this.locations = LocationUtils.getCircle(center, radius, points);
-        this.step = step;
-        this.yDif = 0.0;
+	public Animation19_Sword(Main main, Location center, float radius, int points, boolean small, int step) {
+		this.locations = LocationUtils.getCircle(center, radius, points);
+		this.step = step;
+		this.yDif = 0.0;
 
-        ArmorStand armorStand = center.getWorld().spawn(locations.get(step), ArmorStand.class);
-        NBTEditor.set( armorStand, ( byte ) 1, "Silent" );
-        armorStand.setSilent(true);
-        armorStand.setVisible(false);
-        armorStand.setItemInHand(XMaterial.DIAMOND_SWORD.parseItem());
-        armorStand.setRightArmPose(new EulerAngle( Math.toRadians( -95f ), Math.toRadians( -90f ), Math.toRadians( 80f ) ));
-        armorStand.setGravity(false);
-        armorStand.setSmall(small);
-        armorStand.setMarker(false);
-        armorStand.setRemoveWhenFarAway(false);
-        armorStand.setCustomNameVisible(false);
-        armorStand.setMetadata("ACUBELETS", new FixedMetadataValue(main, Boolean.TRUE));
-        armorStand.teleport(locations.get(step));
+		ArmorStand armorStand = center.getWorld().spawn(locations.get(step), ArmorStand.class);
+		armorStand.setSilent(true);
+		armorStand.setVisible(false);
+		armorStand.setItemInHand(XMaterial.DIAMOND_SWORD.parseItem());
+		armorStand.setRightArmPose(new EulerAngle(Math.toRadians(-95f), Math.toRadians(-90f), Math.toRadians(80f)));
+		armorStand.setGravity(false);
+		armorStand.setSmall(small);
+		armorStand.setMarker(false);
+		armorStand.setRemoveWhenFarAway(false);
+		armorStand.setCustomNameVisible(false);
+		armorStand.setMetadata("ACUBELETS", new FixedMetadataValue(main, Boolean.TRUE));
+		armorStand.teleport(locations.get(step));
 
-        main.getAnimationHandler().getEntities().add(armorStand);
+		main.getAnimationHandler().getEntities().add(armorStand);
 
-        Sounds.playSound(armorStand.getLocation(), Sounds.MySound.ANVIL_LAND, 0.5F, 3);
+		Sounds.playSound(armorStand.getLocation(), Sounds.MySound.ANVIL_LAND, 0.5F, 3);
 
-        this.armorStand = armorStand;
-    }
+		this.armorStand = armorStand;
+	}
 
-    public ArmorStand getArmorStand() { return armorStand; }
+	public ArmorStand getArmorStand() {
+		return armorStand;
+	}
 
-    public int getStep() { return step; }
-    public void setStep(int step) { this.step = step; }
+	public int getStep() {
+		return step;
+	}
 
-    public void run() {
+	public void setStep(int step) {
+		this.step = step;
+	}
 
-        Location loc2 = locations.get(step);
+	public void run() {
 
-        if(step + 1 >= locations.size())
-            loc2.setDirection(locations.get(0).clone().add(0, yDif, 0).toVector().subtract(loc2.toVector()));
-        else
-            loc2.setDirection(locations.get(step + 1).clone().add(0, yDif, 0).toVector().subtract(loc2.toVector()));
+		Location loc2 = locations.get(step);
 
-        armorStand.teleport(loc2);
+		if (step + 1 >= locations.size())
+			loc2.setDirection(locations.get(0).clone().add(0, yDif, 0).toVector().subtract(loc2.toVector()));
+		else loc2.setDirection(locations.get(step + 1).clone().add(0, yDif, 0).toVector().subtract(loc2.toVector()));
 
-        if(step % 2 == 0)
-            UtilParticles.display(Particles.SPELL, armorStand.getLocation().add(armorStand.getLocation().getDirection()
-                    .normalize().multiply(-3).multiply(1)).add(0, 1, 0), 3);
+		armorStand.teleport(loc2);
 
-        this.step++;
-        if(step >= locations.size()) step = 0;
+		if (step % 2 == 0) UtilParticles.display(Particles.SPELL, armorStand.getLocation()
+				.add(armorStand.getLocation().getDirection().normalize().multiply(-3).multiply(1))
+				.add(0, 1, 0), 3);
 
-    }
+		this.step++;
+		if (step >= locations.size()) step = 0;
+
+	}
 
 }
