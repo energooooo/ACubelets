@@ -20,264 +20,256 @@ import java.util.concurrent.ThreadLocalRandom;
 
 public class AnimationHandler {
 
-    private final Main main;
+	private static final List<ItemStack> animationItems;
+	public static String DEFAULT_ANIMATION = "animation2";
+	public static int ANIMATION_COUNT = 24;
 
-    private final Map<String, AnimationSettings> animations;
+	static {
 
-    private List<Animation> tasks;
-    private List<Entity> entities;
+		animationItems = Arrays.asList(XMaterial.BARRIER.parseItem(), XMaterial.FIREWORK_STAR.parseItem(), XMaterial.CRAFTING_TABLE.parseItem(), XMaterial.FIREWORK_ROCKET.parseItem(), XMaterial.NETHERRACK.parseItem(), XMaterial.SANDSTONE.parseItem(), XMaterial.LIME_WOOL.parseItem(), XMaterial.PUMPKIN.parseItem(), XMaterial.RED_WOOL.parseItem(), XMaterial.LADDER.parseItem(), XMaterial.FIRE_CHARGE.parseItem(), XMaterial.ENDER_EYE.parseItem(), XMaterial.CAULDRON.parseItem(), XMaterial.PRISMARINE_SHARD.parseItem(), XMaterial.POPPY.parseItem(), XMaterial.BLAZE_POWDER.parseItem(), XMaterial.PINK_WOOL.parseItem(), XMaterial.SNOWBALL.parseItem(), XMaterial.DIAMOND.parseItem(), XMaterial.ANVIL.parseItem(), XMaterial.ENDER_PEARL.parseItem(), XMaterial.HEART_OF_THE_SEA.parseItem(), XMaterial.PURPUR_BLOCK.parseItem(), XMaterial.RED_CONCRETE.parseItem(), XMaterial.BLACK_CONCRETE.parseItem());
 
-    private File file;
-    private YamlConfiguration config;
+	}
 
-    public static String DEFAULT_ANIMATION = "animation2";
-    public static int ANIMATION_COUNT = 24;
+	private final Main main;
+	private final Map<String, AnimationSettings> animations;
+	private List<Animation> tasks;
+	private List<Entity> entities;
+	private File file;
+	private YamlConfiguration config;
 
-    private static List<ItemStack> animationItems;
-    static {
+	public AnimationHandler(Main main) {
 
-        animationItems = Arrays.asList(
-                XMaterial.BARRIER.parseItem(), XMaterial.FIREWORK_STAR.parseItem(), XMaterial.CRAFTING_TABLE.parseItem(),
-                XMaterial.FIREWORK_ROCKET.parseItem(), XMaterial.NETHERRACK.parseItem(), XMaterial.SANDSTONE.parseItem(),
-                XMaterial.LIME_WOOL.parseItem(), XMaterial.PUMPKIN.parseItem(), XMaterial.RED_WOOL.parseItem(),
-                XMaterial.LADDER.parseItem(), XMaterial.FIRE_CHARGE.parseItem(), XMaterial.ENDER_EYE.parseItem(),
-                XMaterial.CAULDRON.parseItem(), XMaterial.PRISMARINE_SHARD.parseItem(), XMaterial.POPPY.parseItem(),
-                XMaterial.BLAZE_POWDER.parseItem(), XMaterial.PINK_WOOL.parseItem(), XMaterial.SNOWBALL.parseItem(),
-                XMaterial.DIAMOND.parseItem(), XMaterial.ANVIL.parseItem(), XMaterial.ENDER_PEARL.parseItem(),
-                XMaterial.HEART_OF_THE_SEA.parseItem(), XMaterial.PURPUR_BLOCK.parseItem(), XMaterial.RED_CONCRETE.parseItem(),
-                XMaterial.BLACK_CONCRETE.parseItem()
-        );
+		this.main = main;
+		this.animations = new HashMap<>();
+		this.tasks = new ArrayList<>();
+		this.entities = new ArrayList<>();
 
-    }
+	}
 
-    public AnimationHandler(Main main) {
+	public void loadAnimations() {
 
-        this.main = main;
-        this.animations = new HashMap<>();
-        this.tasks = new ArrayList<>();
-        this.entities = new ArrayList<>();
+		File file = new File(main.getDataFolder(), "animations.yml");
+		if (!file.exists()) {
+			try {
+				file.createNewFile();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
 
-    }
+		try {
+			ConfigUpdater.update(main, "animations.yml", new File(main.getDataFolder(), "animations.yml"), Collections.emptyList());
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 
-    public void loadAnimations() {
+		YamlConfiguration config = YamlConfiguration.loadConfiguration(file);
 
-        File file = new File(main.getDataFolder(), "animations.yml");
-        if(!file.exists()) {
-            try { file.createNewFile();
-            } catch (IOException e) { e.printStackTrace(); }
-        }
+		this.file = file;
+		this.config = config;
 
-        try {
-            ConfigUpdater.update(main, "animations.yml", new File(main.getDataFolder(), "animations.yml"), Collections.emptyList());
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+		this.animations.clear();
 
-        YamlConfiguration config = YamlConfiguration.loadConfiguration(file);
+		for (int index = 0; index <= ANIMATION_COUNT; index++) {
 
-        this.file = file;
-        this.config = config;
+			AnimationSettings animation = new AnimationSettings("animation" + index);
 
-        this.animations.clear();
+			String animationId = "animation_" + index;
 
-        for(int index = 0; index <= ANIMATION_COUNT; index++) {
+			animation.setAnimationNumber(index);
 
-            AnimationSettings animation = new AnimationSettings("animation" + index);
+			animation.setEnabled(config.getBoolean("animations." + animationId + ".Enabled", true));
 
-            String animationId = "animation_" + index;
+			animation.setDisplayName(config.getString("animations." + animationId + ".DisplayName", "Unknown"));
 
-            animation.setAnimationNumber(index);
+			animation.setOutlineParticles(config.getBoolean("animations." + animationId + ".OutlineParticles", true));
 
-            animation.setEnabled(config.getBoolean("animations." + animationId + ".Enabled", true));
+			animation.setFloorParticles(config.getBoolean("animations." + animationId + ".FloorParticles", true));
 
-            animation.setDisplayName(config.getString("animations." + animationId + ".DisplayName", "Unknown"));
+			animation.setAroundParticles(config.getBoolean("animations." + animation + ".AroundParticles", true));
 
-            animation.setOutlineParticles(config.getBoolean("animations." + animationId + ".OutlineParticles", true));
+			animation.setNeedPermission(config.getBoolean("animations." + animation + ".NeedPermission", true));
 
-            animation.setFloorParticles(config.getBoolean("animations." + animationId + ".FloorParticles", true));
+			animation.setChangeBlocks(config.getBoolean("animations." + animationId + ".ChangeBlocks", true));
 
-            animation.setAroundParticles(config.getBoolean("animations." + animation + ".AroundParticles", true));
+			if (config.contains("animations." + animationId + ".Icon") && config.getConfigurationSection("animations." + animationId + ".Icon") != null) {
 
-            animation.setNeedPermission(config.getBoolean("animations." + animation + ".NeedPermission", true));
+				ItemStack item = XItemStack.deserialize(Utils.getConfigurationSection(config, "animations." + animationId + ".Icon"));
 
-            animation.setChangeBlocks(config.getBoolean("animations." + animationId + ".ChangeBlocks", true));
+				animation.setDisplayItem(item);
 
-            if(config.contains("animations." + animationId + ".Icon")
-                    && config.getConfigurationSection("animations." + animationId + ".Icon") != null) {
+			} else {
 
-                ItemStack item = XItemStack.deserialize(Utils.getConfigurationSection(config, "animations." + animationId + ".Icon"));
+				animation.setDisplayItem(animationItems.get(index));
 
-                animation.setDisplayItem(item);
+			}
 
-            } else {
+			this.animations.put("animation" + index, animation);
 
-                animation.setDisplayItem(animationItems.get(index));
+		}
 
-            }
+		DEFAULT_ANIMATION = config.getString("default_animation", "animation2");
 
-            this.animations.put("animation" + index, animation);
+		saveAnimations();
 
-        }
+	}
 
-        DEFAULT_ANIMATION = config.getString("default_animation", "animation2");
+	public void saveAnimations() {
 
-        saveAnimations();
+		config.set("default_animation", DEFAULT_ANIMATION);
 
-    }
+		for (AnimationSettings animationSettings : animations.values()) {
 
-    public void saveAnimations() {
+			String animationId = "animation_" + animationSettings.getAnimationNumber();
 
-        config.set("default_animation", DEFAULT_ANIMATION);
+			config.set("animations." + animationId, null);
 
-        for(AnimationSettings animationSettings : animations.values()) {
+			config.set("animations." + animationId + ".Enabled", animationSettings.isEnabled());
 
-            String animationId = "animation_" + animationSettings.getAnimationNumber();
+			config.set("animations." + animationId + ".DisplayName", animationSettings.getDisplayName());
 
-            config.set("animations." + animationId, null);
+			config.set("animations." + animationId + ".OutlineParticles", animationSettings.isOutlineParticles());
 
-            config.set("animations." + animationId + ".Enabled", animationSettings.isEnabled());
+			config.set("animations." + animationId + ".FloorParticles", animationSettings.isFloorParticles());
 
-            config.set("animations." + animationId + ".DisplayName", animationSettings.getDisplayName());
+			config.set("animations." + animationId + ".AroundParticles", animationSettings.isAroundParticles());
 
-            config.set("animations." + animationId + ".OutlineParticles", animationSettings.isOutlineParticles());
+			config.set("animations." + animationId + ".NeedPermission", animationSettings.isNeedPermission());
 
-            config.set("animations." + animationId + ".FloorParticles", animationSettings.isFloorParticles());
+			config.set("animations." + animationId + ".ChangeBlocks", animationSettings.isChangeBlocks());
 
-            config.set("animations." + animationId + ".AroundParticles", animationSettings.isAroundParticles());
+			XItemStack.serialize(animationSettings.getDisplayItem(), Utils.getConfigurationSection(config, "animations." + animationId + ".Icon"));
+		}
 
-            config.set("animations." + animationId + ".NeedPermission", animationSettings.isNeedPermission());
+		try {
+			config.save(file);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 
-            config.set("animations." + animationId + ".ChangeBlocks", animationSettings.isChangeBlocks());
+		try {
+			ConfigUpdater.update(main, "animations.yml", new File(main.getDataFolder(), "animations.yml"), Collections.emptyList());
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 
-            XItemStack.serialize(animationSettings.getDisplayItem(), Utils.getConfigurationSection(config, "animations." + animationId + ".Icon"));
-        }
+	}
 
-        try {
-            config.save(file);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+	public AnimationSettings getAnimationSetting(String id) {
+		return animations.containsKey(id) ? animations.get(id) : animations.get(DEFAULT_ANIMATION);
+	}
 
-        try {
-            ConfigUpdater.update(main, "animations.yml", new File(main.getDataFolder(), "animations.yml"), Collections.emptyList());
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+	public Animation getAnimation(String animation) {
 
-    }
+		AnimationSettings animationSettings = getAnimationSetting(animation);
 
-    public AnimationSettings getAnimationSetting(String id) {
-        return animations.containsKey(id) ? animations.get(id) : animations.get(DEFAULT_ANIMATION);
-    }
+		Animation animationObject = null;
 
-    public Animation getAnimation(String animation) {
+		if (animationSettings != null) {
 
-        AnimationSettings animationSettings = getAnimationSetting(animation);
+			int index = animationSettings.getAnimationNumber();
 
-        Animation animationObject = null;
+			try {
 
-        if(animationSettings != null) {
+				Class<?> clazz = Class.forName("me.davidml16.acubelets.animations.animation.animation" + index + ".Animation" + index + "_Task");
+				Constructor<?> constructor = clazz.getConstructor(Main.class, AnimationSettings.class);
 
-            int index = animationSettings.getAnimationNumber();
+				animationObject = (Animation) constructor.newInstance(main, animationSettings);
 
-            try {
+			} catch (ClassNotFoundException | NoSuchMethodException | InvocationTargetException |
+					 InstantiationException | IllegalAccessException e) {
+				e.printStackTrace();
+			}
 
-                Class<?> clazz = Class.forName("me.davidml16.acubelets.animations.animation.animation" + index + ".Animation" + index + "_Task");
-                Constructor<?> constructor = clazz.getConstructor(Main.class, AnimationSettings.class);
+		}
 
-                animationObject = (Animation) constructor.newInstance(main, animationSettings);
+		return animationObject != null ? animationObject : new Animation2_Task(main, getAnimationSetting("animation2"));
 
-            } catch (ClassNotFoundException | NoSuchMethodException | InvocationTargetException | InstantiationException | IllegalAccessException e) {
-                e.printStackTrace();
-            }
+	}
 
-        }
+	public List<AnimationSettings> getAnimationsAvailable(Player player) {
 
-        return animationObject != null ? animationObject : new Animation2_Task(main, getAnimationSetting("animation2"));
+		List<AnimationSettings> animations = new ArrayList<>();
 
-    }
+		for (AnimationSettings animation : this.getAnimations().values()) {
+			if (animation.getAnimationNumber() == 0) continue;
 
-    public List<AnimationSettings> getAnimationsAvailable(Player player) {
+			if (!animation.isEnabled()) continue;
+			if (animation.isNeedPermission()) if (!haveAnimationPermission(player, animation)) continue;
 
-        List<AnimationSettings> animations = new ArrayList<>();
+			animations.add(animation);
+		}
 
-        for(AnimationSettings animation : this.getAnimations().values()) {
-            if(animation.getAnimationNumber() == 0) continue;
+		return animations;
 
-            if(animation.isNeedPermission()) if(!haveAnimationPermission(player, animation)) continue;
+	}
 
-            animations.add(animation);
-        }
+	public List<AnimationSettings> getAnimationSettings() {
 
-        return animations;
+		List<AnimationSettings> animationSettings = new ArrayList<>();
 
-    }
+		for (AnimationSettings animation : animations.values()) {
 
-    public List<AnimationSettings> getAnimationSettings() {
+			if (!animation.getId().equalsIgnoreCase(DEFAULT_ANIMATION) && !animation.isEnabled()) continue;
 
-        List<AnimationSettings> animationSettings = new ArrayList<>();
+			animationSettings.add(animation);
 
-        for(AnimationSettings animation : animations.values()) {
+		}
 
-            if(!animation.getId().equalsIgnoreCase(DEFAULT_ANIMATION) && !animation.isEnabled())
-                continue;
+		return animationSettings;
 
-            animationSettings.add(animation);
+	}
 
-        }
+	public AnimationSettings getRandomAnimation(Player player) {
+		List<AnimationSettings> animations = getAnimationsAvailable(player);
+		return animations.get(ThreadLocalRandom.current().nextInt(animations.size()) % animations.size());
+	}
 
-        return animationSettings;
+	public AnimationSettings getRandomAnimation() {
+		List<AnimationSettings> animations = new ArrayList<>(getAnimations().values());
+		animations.removeIf(animation -> !animation.isEnabled());
+		return animations.get(ThreadLocalRandom.current().nextInt(animations.size()) % animations.size());
+	}
 
-    }
+	public boolean haveAnimationPermission(Player player, AnimationSettings animationSettings) {
+		return (animationSettings.getId()
+				.equalsIgnoreCase(DEFAULT_ANIMATION) || player.hasPermission("acubelets.animations.*") || player.hasPermission("acubelets.animations.animation" + animationSettings.getAnimationNumber()));
+	}
 
-    public AnimationSettings getRandomAnimation(Player player) {
-        List<AnimationSettings> animations = getAnimationsAvailable(player);
-        return animations.get(ThreadLocalRandom.current().nextInt(animations.size()) % animations.size());
-    }
+	public List<Animation> getTasks() {
+		return tasks;
+	}
 
-    public AnimationSettings getRandomAnimation() {
-        List<AnimationSettings> animations = new ArrayList<>(getAnimations().values());
-        return animations.get(ThreadLocalRandom.current().nextInt(animations.size()) % animations.size());
-    }
+	public void setTasks(List<Animation> tasks) {
+		this.tasks = tasks;
+	}
 
-    public boolean haveAnimationPermission(Player player, AnimationSettings animationSettings) {
-        return (animationSettings.getId().equalsIgnoreCase(DEFAULT_ANIMATION) ||
-                player.hasPermission("acubelets.animations.*") ||
-                player.hasPermission("acubelets.animations.animation" + animationSettings.getAnimationNumber()));
-    }
+	public List<Entity> getEntities() {
+		return entities;
+	}
 
-    public List<Animation> getTasks() {
-        return tasks;
-    }
+	public void setEntities(List<Entity> entities) {
+		this.entities = entities;
+	}
 
-    public void setTasks(List<Animation> tasks) {
-        this.tasks = tasks;
-    }
+	public Map<String, AnimationSettings> getAnimations() {
+		return animations;
+	}
 
-    public List<Entity> getEntities() {
-        return entities;
-    }
+	public File getFile() {
+		return file;
+	}
 
-    public void setEntities(List<Entity> entities) {
-        this.entities = entities;
-    }
+	public void setFile(File file) {
+		this.file = file;
+	}
 
-    public Map<String, AnimationSettings> getAnimations() { return animations; }
+	public YamlConfiguration getConfig() {
+		return config;
+	}
 
-    public File getFile() {
-        return file;
-    }
-
-    public void setFile(File file) {
-        this.file = file;
-    }
-
-    public YamlConfiguration getConfig() {
-        return config;
-    }
-
-    public void setConfig(YamlConfiguration config) {
-        this.config = config;
-    }
+	public void setConfig(YamlConfiguration config) {
+		this.config = config;
+	}
 
 }
