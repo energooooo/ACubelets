@@ -12,68 +12,82 @@ import org.bukkit.entity.Player;
 
 public class CubeletOpenHandler {
 
-    private Main main;
-    public CubeletOpenHandler(Main main) {
-        this.main = main;
-    }
+	private final Main main;
 
-    public void openAnimation(Player p, CubeletMachine box, CubeletType type, boolean openedByKey) {
-        if(box.isWaiting()) {
+	public CubeletOpenHandler(Main main) {
+		this.main = main;
+	}
 
-            CubeletOpener cubeletOpener = new CubeletOpener(p.getUniqueId(), p.getName());
+	public void openAnimation(Player p, CubeletMachine box, CubeletType type, boolean openedByKey) {
+		if (box.isWaiting()) {
 
-            box.setPlayerOpening(cubeletOpener);
+			CubeletOpener cubeletOpener = new CubeletOpener(p.getUniqueId(), p.getName());
 
-            main.getHologramImplementation().clearLines(box);
+			box.setPlayerOpening(cubeletOpener);
 
-            Animation animation;
+			main.getHologramImplementation().clearLines(box);
 
-            if(!main.isSetting("AnimationsByPlayer") || openedByKey) {
+			Animation animation;
 
-                if(!type.getAnimation().equalsIgnoreCase("random")) {
+			if (!main.isSetting("AnimationsByPlayer") || openedByKey) {
 
-                    animation = main.getAnimationHandler().getAnimation(type.getAnimation());
+				if (!type.getAnimation().equalsIgnoreCase("random")) {
 
-                } else {
+					animation = main.getAnimationHandler().getAnimation(type.getAnimation());
 
-                    animation = main.getAnimationHandler().getAnimation(main.getAnimationHandler().getRandomAnimation().getId());
+				} else {
 
-                }
+					animation = main.getAnimationHandler()
+							.getAnimation(main.getAnimationHandler().getRandomAnimation().getId());
 
-            } else {
+				}
 
-                Profile profile = main.getPlayerDataHandler().getData(p);
+			} else {
 
-                if(!profile.getAnimation().equalsIgnoreCase("random")) {
+				Profile profile = main.getPlayerDataHandler().getData(p);
 
-                    AnimationSettings animationSetting = main.getAnimationHandler().getAnimationSetting(profile.getAnimation());
-                    if (animationSetting.isNeedPermission()) {
-                        if (!main.getAnimationHandler().haveAnimationPermission(p, animationSetting))
-                            profile.setAnimation(AnimationHandler.DEFAULT_ANIMATION);
-                    }
+				if (!profile.getAnimation().equalsIgnoreCase("random")) {
 
-                    animation = main.getAnimationHandler().getAnimation(profile.getAnimation());
+					AnimationSettings animationSetting = main.getAnimationHandler()
+							.getAnimationSetting(profile.getAnimation());
 
-                } else {
+					if (animationSetting == null) {
+						main.getLogger()
+								.warning("Animation setting for " + profile.getAnimation() + " not found for player " + p.getName());
+						profile.setAnimation(AnimationHandler.DEFAULT_ANIMATION);
+						animationSetting = main.getAnimationHandler()
+								.getAnimationSetting(AnimationHandler.DEFAULT_ANIMATION);
+					}
 
-                    animation = main.getAnimationHandler().getAnimation(main.getAnimationHandler().getRandomAnimation(p).getId());
+					if (animationSetting.isNeedPermission()) {
+						if (!main.getAnimationHandler().haveAnimationPermission(p, animationSetting))
+							profile.setAnimation(AnimationHandler.DEFAULT_ANIMATION);
+					}
 
-                }
+					animation = main.getAnimationHandler().getAnimation(profile.getAnimation());
 
-            }
+				} else {
 
-            animation.setCubeletBox(box);
-            animation.setCubeletType(type);
-            animation.start();
+					animation = main.getAnimationHandler()
+							.getAnimation(main.getAnimationHandler().getRandomAnimation(p).getId());
 
-        } else {
-            if(box.getPlayerOpening().getUuid() == p.getUniqueId()) {
-                p.sendMessage(main.getLanguageHandler().getMessage("Cubelet.BoxInUse.Me"));
-            } else {
-                p.sendMessage(main.getLanguageHandler().getMessage("Cubelet.BoxInUse.Other")
-                        .replaceAll("%player%", box.getPlayerOpening().getName()));
-            }
-        }
-    }
+				}
+
+			}
+
+			animation.setCubeletBox(box);
+			animation.setCubeletType(type);
+			animation.start();
+
+		} else {
+			if (box.getPlayerOpening().getUuid() == p.getUniqueId()) {
+				p.sendMessage(main.getLanguageHandler().getMessage("Cubelet.BoxInUse.Me"));
+			} else {
+				p.sendMessage(main.getLanguageHandler()
+						.getMessage("Cubelet.BoxInUse.Other")
+						.replaceAll("%player%", box.getPlayerOpening().getName()));
+			}
+		}
+	}
 
 }

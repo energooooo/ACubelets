@@ -2,6 +2,8 @@ package me.davidml16.acubelets.animations;
 
 import com.cryptomorin.xseries.XItemStack;
 import com.cryptomorin.xseries.XMaterial;
+import lombok.Getter;
+import lombok.Setter;
 import me.davidml16.acubelets.Main;
 import me.davidml16.acubelets.animations.animation.animation2.Animation2_Task;
 import me.davidml16.acubelets.utils.ConfigUpdater;
@@ -31,10 +33,19 @@ public class AnimationHandler {
 	}
 
 	private final Main main;
+	@Getter
 	private final Map<String, AnimationSettings> animations;
+	@Setter
+	@Getter
 	private List<Animation> tasks;
+	@Setter
+	@Getter
 	private List<Entity> entities;
+	@Setter
+	@Getter
 	private File file;
+	@Setter
+	@Getter
 	private YamlConfiguration config;
 
 	public AnimationHandler(Main main) {
@@ -234,42 +245,6 @@ public class AnimationHandler {
 	public boolean haveAnimationPermission(Player player, AnimationSettings animationSettings) {
 		return (animationSettings.getId()
 				.equalsIgnoreCase(DEFAULT_ANIMATION) || player.hasPermission("acubelets.animations.*") || player.hasPermission("acubelets.animations.animation" + animationSettings.getAnimationNumber()));
-	}
-
-	public List<Animation> getTasks() {
-		return tasks;
-	}
-
-	public void setTasks(List<Animation> tasks) {
-		this.tasks = tasks;
-	}
-
-	public List<Entity> getEntities() {
-		return entities;
-	}
-
-	public void setEntities(List<Entity> entities) {
-		this.entities = entities;
-	}
-
-	public Map<String, AnimationSettings> getAnimations() {
-		return animations;
-	}
-
-	public File getFile() {
-		return file;
-	}
-
-	public void setFile(File file) {
-		this.file = file;
-	}
-
-	public YamlConfiguration getConfig() {
-		return config;
-	}
-
-	public void setConfig(YamlConfiguration config) {
-		this.config = config;
 	}
 
 }
