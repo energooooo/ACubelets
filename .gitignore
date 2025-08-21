@@ -1,3 +1,5 @@
 target
 out
 server
+/C:/ # Linux users have a problem when this folder is created automatically during compilation
+.idea/ # dotfiles should be ignored in remote
