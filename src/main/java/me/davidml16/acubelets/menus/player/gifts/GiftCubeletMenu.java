@@ -186,7 +186,7 @@ public class GiftCubeletMenu extends Menu {
 
 				GiftMenu giftMenu = new GiftMenu(getMain(), player);
 				giftMenu.setAttribute(AttrType.GIFT_GUISESSION_ATTR, giftGuiSession);
-
+                giftMenu.open();
 				break;
 
 		}
