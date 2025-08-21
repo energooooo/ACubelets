@@ -1,5 +1,5 @@
 target
 out
 server
-.idea/ # dotfiles should be ignored in remote
+.idea/
 *.iml
