@@ -32,7 +32,7 @@ git switch your_branch_name
 ###### 6. Commit, pull, merge and push your changes in forked repository
 ```bash
 git add .
-git commit -m "In my commit i change..."
+git commit -m "feat: add new animation type"
 
 git switch master
 git pull origin master
@@ -40,6 +40,8 @@ git pull origin master
 git merge your_branch_name
 git push origin master
 ```
+**Note:** We prefer using conventional commits to keep the history clear and maintainable.
+Examples of conventional commit prefixes: feat, fix, chore, docs, refactor, test.
 ###### 6. Open a pull request by clicking the "Contribute" button on your fork's GitHub page
 ###### Thanks for supporting ❤️
 
