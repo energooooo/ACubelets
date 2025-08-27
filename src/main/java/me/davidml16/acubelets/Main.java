@@ -274,6 +274,9 @@ public class Main extends JavaPlugin {
 		settings.put("Rewards.Preview.Enabled", getConfig().getBoolean("Rewards.Preview.Enabled"));
 
 		settings.put("GiftCubeletsCommand", getConfig().getBoolean("GiftCubeletsCommand"));
+
+        settings.put("GiftMenuSpareHeadType", getConfig().getString("GiftMenuSpareHeadType"));
+        settings.put("GiftMenuSpareHeadValue", getConfig().getString("GiftMenuSpareHeadValue"));
 	}
 
 	public boolean isSetting(String key) {

@@ -2,6 +2,7 @@ package me.davidml16.acubelets.handlers;
 
 import me.davidml16.acubelets.Main;
 import me.davidml16.acubelets.animations.Animation;
+import me.davidml16.acubelets.utils.SkullUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
@@ -72,6 +73,8 @@ public class PluginHandler {
 
         if(main.isSetting("LiveGuiUpdates"))
             main.getLiveGuiTask().start();
+
+        SkullUtils.reload();
     }
 
 }
