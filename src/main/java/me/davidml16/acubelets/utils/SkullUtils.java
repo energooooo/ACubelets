@@ -2,7 +2,6 @@ package me.davidml16.acubelets.utils;
 
 import com.cryptomorin.xseries.profiles.builder.XSkull;
 import com.cryptomorin.xseries.profiles.exceptions.ProfileChangeException;
-import com.cryptomorin.xseries.profiles.exceptions.ProfileException;
 import com.cryptomorin.xseries.profiles.objects.ProfileInputType;
 import com.cryptomorin.xseries.profiles.objects.Profileable;
 import lombok.experimental.UtilityClass;
@@ -44,7 +43,7 @@ public class SkullUtils {
             // Try to return get player's skull by inputType
             return XSkull.createItem().profile(Profileable.of(inputType, input)).apply();
         } catch (Exception ignored) {
-            // If player not found (offline) or others exception throwed
+            // If player not found (offline) or others exception thrown
             return spareItem();
         }
     }
@@ -61,7 +60,7 @@ public class SkullUtils {
         try {
             final ProfileInputType inputType = ProfileInputType.valueOf(inputTypeString);
             return XSkull.createItem().profile(Profileable.of(inputType, value)).apply();
-            // Try to return a head by properties from configuration=
+            // Try to return a head by properties from configuration
         } catch (IllegalArgumentException exception) {
             // Throws when inputType (ProfileInputType) invalid
             Main.get().getLogger().severe("GiftMenuSpareHeadType '" + inputTypeString + "' is not allowed. Please, check your configuration file.");
