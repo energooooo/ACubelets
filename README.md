@@ -8,8 +8,7 @@ You can choose from a large selection of animations
 for the opening of your cubelet!
 
 > Available for purchase at:
-[SpigotMC](https://www.spigotmc.org/resources/acubelets-%E2%AD%90-23-animations-%E2%AD%90-1-16-1-21-8.78092/),
-[Polymart](https://polymart.org/product/408/acubelets-13-animations) and
+[SpigotMC](https://www.spigotmc.org/resources/acubelets-%E2%AD%90-23-animations-%E2%AD%90-1-16-1-21-8.78092/) and
 [BuiltByBit](https://builtbybit.com/resources/acubelets.45566/).
 
 ## For developers
